@@ -21,4 +21,4 @@ int main(){
 
 }
 
-//End of program 10/2/19@~2:01PM [Modified on 10/16/19 @5:29PM]
+//End of program []
