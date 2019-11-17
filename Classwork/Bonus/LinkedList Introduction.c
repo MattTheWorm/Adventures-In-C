@@ -7,7 +7,11 @@ Desc: LinkedList bonus assignment.
 #include <stdlib.h>
 //Structure Declaration
 
+struct Part{
 
+
+
+};
 
 //End
 //Function Declaration
@@ -16,6 +20,7 @@ Desc: LinkedList bonus assignment.
 
 //End
 int main(){
+
     printf("Hello World!");
     return 0;
 
