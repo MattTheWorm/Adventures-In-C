@@ -8,9 +8,11 @@ Desc: LinkedList bonus assignment.
 //Structure Declaration
 
 struct Part{
+    int num;
+    int quantity;
+    double price;
 
-
-
+    struct Part *next;
 };
 
 //End
