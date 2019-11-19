@@ -5,6 +5,7 @@ Desc: LinkedList bonus assignment.
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <dirent.h>
 //Structure Declaration
 
 struct Part{
@@ -13,22 +14,25 @@ struct Part{
     double price;
 
     struct Part *next;
+
 };
 
 //End
 //Function Declaration
 
 void printHelp();
-void createList(struct Part *head);
+void createList(struct Part *head, DIR *exportP);
 
 //End
 int main(){
     struct Part Part1 = {10, 10, 9.99, NULL};
     struct Part *head = &Part1;
+    DIR *exportP; //Export folder pointer.
+    FILE *importP; //Import file pointer.
 
     printf("LinkedList session begin.\n");
     printHelp();
-    createList(head);
+    createList(head, exportP);
     return 0;
 
 }
@@ -67,8 +71,9 @@ void printHelp(){
 //////////
 // createList
 //////////
-void createList(struct Part *head){
-    char yesNo = 0;
+void createList(struct Part *head, DIR *exportP){
+    FILE
+    char yesNo = 0, fileName[256];
 
     if(!head){
         puts("[Create]: No head pointer detected, assuming new list.");
@@ -83,11 +88,26 @@ void createList(struct Part *head){
 
             switch(yesNo){
                 case 'Y': case 'y':
-                    //printf("User chose yes.\n");
+                    if(!(exportP = opendir("exports"))){ //If exports folder doesn't exist
+                            puts("[Create]: Attempting to make folder for exports..\n");
+                        if(!mkdir("exports")){ //If the directory is created
+                            puts("[Create]: Exports folder successfully created. Enter the filename\n");
+
+
+                        }
+                        else{
+                            puts("[Create]: Exports folder creation failed! Exiting.\n");
+                            exit(EXIT_FAILURE);
+
+                        }
+
+                    }
+
+                    //puts("User chose yes.\n");
                     break;
 
                 case 'N': case 'n':
-                    //printf("User chose no.\n");
+                    puts("[Create]: List discarded and creating new list.")
                     break;
 
                 default:
@@ -97,7 +117,7 @@ void createList(struct Part *head){
             }
         }
 
-        printf("Head Data\nNum: %d\nQuant: %d\nPrice: $%.2lf\nNextPtr: %p", head->num, head->quantity, head->price, head->next);
+
 
     }
 
