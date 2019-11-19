@@ -6,6 +6,7 @@ Desc: LinkedList bonus assignment.
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <string.h>
 //Structure Declaration
 
 struct Part{
@@ -30,7 +31,7 @@ int main(){
     DIR *exportP; //Export folder pointer.
     FILE *importP; //Import file pointer.
 
-    printf("LinkedList session begin.\n");
+    puts("[Main]: LinkedList session begin.\n");
     printHelp();
     createList(head, exportP);
     return 0;
@@ -72,8 +73,8 @@ void printHelp(){
 // createList
 //////////
 void createList(struct Part *head, DIR *exportP){
-    FILE
-    char yesNo = 0, fileName[256];
+    FILE *exportOut;
+    char yesNo = 0, fileName[128], path[137] = "exports/";
 
     if(!head){
         puts("[Create]: No head pointer detected, assuming new list.");
@@ -86,38 +87,86 @@ void createList(struct Part *head, DIR *exportP){
             yesNo = getchar();
             while(getchar() != '\n'); //Rid ALL extra characters.
 
+            printf("User entered: %c", yesNo);
             switch(yesNo){
                 case 'Y': case 'y':
                     if(!(exportP = opendir("exports"))){ //If exports folder doesn't exist
-                            puts("[Create]: Attempting to make folder for exports..\n");
+                            puts("[Create]: Attempting to make folder for exports..");
                         if(!mkdir("exports")){ //If the directory is created
-                            puts("[Create]: Exports folder successfully created. Enter the filename\n");
+                            puts("[Create]: Exports folder successfully created.");
 
 
                         }
                         else{
-                            puts("[Create]: Exports folder creation failed! Exiting.\n");
+                            puts("[Create]: Exports folder creation failed! Exiting.");
                             exit(EXIT_FAILURE);
 
                         }
 
                     }
 
-                    //puts("User chose yes.\n");
+                    yesNo = 0;
+                    while(yesNo){
+                        puts("[Create]: Enter the list filename.");
+                        fputs("Input: ", stdout);
+                        fgets(fileName, sizeof(fileName), stdin);
+                        int i = 0;
+                        while(fileName[i] != '\0'){ //Removing newline character if present.
+                            if(fileName[i] == '\n'){
+                                fileName[i] = '\0';
+
+                            }
+
+                            i++;
+
+                        }
+
+                        strcat(strcat(path, fileName), ".csv");
+                        //printf("Full path: %s\n", path);
+                        if(!(exportOut = fopen(path, "w"))){
+                            int failBool = 0;
+
+                            puts("File creation failed! Do you want to try again? [Y/N]");
+                            while(!failBool){
+                                fputs("Input: ", stdout);
+                                yesNo = getchar();
+                                while(getchar() != '\n');
+
+                                switch(yesNo){
+                                    case 'Y': case 'y':
+                                        puts("User chose yes.");
+                                        failBool = 1;
+                                        break;
+
+                                    case 'N': case 'n':
+                                        puts("User chose no.");
+                                        failBool = 1;
+                                        break;
+
+                                    default:
+                                        puts("Invalid input. [Y or N]");
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+                    //printf("User entered: %s | fileName Size: %d", fileName, sizeof(fileName));
                     break;
 
                 case 'N': case 'n':
-                    puts("[Create]: List discarded and creating new list.")
+                    puts("[Create]: List discarded and creating new list.");
                     break;
 
                 default:
                     yesNo = 0;
-                    puts("Invalid input. --> [Y or N]\n");
+                    puts("Invalid input. --> [Y or N]");
 
             }
+
         }
-
-
 
     }
 
