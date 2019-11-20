@@ -21,16 +21,32 @@ struct Part{
 //Function Declaration
 
 void printHelp();
-void createList(struct Part *head);
+void createList(struct Part **head);
 
 //End
 int main(){
-    struct Part Part1 = {10, 10, 9.99, NULL};
-    struct Part *head = &Part1;
+    //Parts
+    struct Part *Part1 = (struct Part *)malloc(sizeof(struct Part));
+    Part1->num = 10;
+    Part1->quantity = 10;
+    Part1->price = 9.99;
+    struct Part *Part2 = (struct Part *)malloc(sizeof(struct Part));
+    Part2->num = 10;
+    Part2->quantity = 10;
+    Part2->price = 9.99;
+    struct Part *Part3 = (struct Part *)malloc(sizeof(struct Part));
+    Part3->num = 10;
+    Part3->quantity = 10;
+    Part3->price = 9.99;
+    //Head/Next
+    struct Part *head = Part1;
+    Part1->next = Part2;
+    Part2->next = Part3;
+    Part3->next = NULL;
 
-    printf("LinkedList session begin.\n");
+    puts("LinkedList session begin.");
     printHelp();
-    createList(head);
+    createList(&head);
     return 0;
 
 }
@@ -67,9 +83,38 @@ void printHelp(){
 
 }
 //////////
+// deleteList
+//////////
+void deleteList(struct Part **head){
+    if(*head){
+        struct Part *temp = (*head)->next;
+        //printf("Head data: %d\n", (*head)->num);
+        int i = 1;
+
+        puts("[Delete]: List found. Deleting.");
+        free(*head); //Free head first
+        while(temp){
+            *head = temp;
+            temp = temp->next;
+            free(*head);
+            i++;
+
+        }
+
+        *head = NULL;
+        printf("[Delete]: %d list items deleted. List cleared.", i);
+
+    }
+    else{
+        puts("[Delete]: List doesn't exist!");
+
+    }
+
+}
+//////////
 // createList
 //////////
-void createList(struct Part *head){
+void createList(struct Part **head){
     //File Vars
     FILE *exportFileOut; //Export file out
     DIR *exportFolOut; //Export folder out
@@ -79,7 +124,7 @@ void createList(struct Part *head){
     int failLoop = 1; //Validation var1
     char yesNo = 0;
 
-    if(!head){//If head is null, AKA no list
+    if(!*head){//If head is null, AKA no list
         puts("[Create]: No head pointer detected, assuming new list.");
 
     }
@@ -97,12 +142,15 @@ void createList(struct Part *head){
                     break;
 
                 case 'N': case 'n':
-                    puts("Discarding current list.");
+                    puts("[Create]: Discarding current list.");
+                    //printf("Head value before: %p\n", *head);
+                    deleteList(head);
+                    //printf("Head value after: %p\n", *head);
                     //failLoop = 0;
                     break;
 
                 default:
-                    puts("Invalid input. Enter either Y or N.");
+                    puts("[Create]: Invalid input. Enter either Y or N.");
 
                 //-----
 
