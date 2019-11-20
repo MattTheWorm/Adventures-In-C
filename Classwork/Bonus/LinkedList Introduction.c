@@ -5,6 +5,7 @@ Desc: LinkedList bonus assignment.
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <dirent.h>
 //Structure Declaration
 
@@ -21,7 +22,8 @@ struct Part{
 //Function Declaration
 
 void printHelp();
-void createList(struct Part **head);
+void deleteList(struct Part **head);
+int createList(struct Part **head);
 
 //End
 int main(){
@@ -83,10 +85,25 @@ void printHelp(){
 
 }
 //////////
+// saveList
+//////////
+void saveList(struct Part **head){
+
+
+
+
+
+
+
+
+
+
+}
+//////////
 // deleteList
 //////////
 void deleteList(struct Part **head){
-    if(*head){
+    if(*head){ //If head exists
         struct Part *temp = (*head)->next;
         //printf("Head data: %d\n", (*head)->num);
         int i = 1;
@@ -102,7 +119,7 @@ void deleteList(struct Part **head){
         }
 
         *head = NULL;
-        printf("[Delete]: %d list items deleted. List cleared.", i);
+        printf("[Delete]: %d list items deleted. List cleared.\n", i);
 
     }
     else{
@@ -114,40 +131,87 @@ void deleteList(struct Part **head){
 //////////
 // createList
 //////////
-void createList(struct Part **head){
+int createList(struct Part **head){//0 Return success, else fail (for now).
     //File Vars
     FILE *exportFileOut; //Export file out
     DIR *exportFolOut; //Export folder out
-    char fileName[65], path[128] = "export/";//Filename Size 64 characters
+    char fileName[65], path[76] = "export/";//Filename Size 64 characters
 
     //IO Vars
-    int failLoop = 1; //Validation var1
+    int failLoop = 1, i; //Validation Var1
     char yesNo = 0;
 
     if(!*head){//If head is null, AKA no list
         puts("[Create]: No head pointer detected, assuming new list.");
+        return 0;
 
     }
     else{
         puts("[Create]: List detected. Do you want to save the current list to file? [Y/N]");
-        while(failLoop){
+        while(1){
             fputs("Input: ", stdout);
             yesNo = getchar();
             while(getchar() != '\n'); //Clear buffer
 
             switch(yesNo){
                 case 'Y': case 'y':
-                    puts("User chose yes.");
-                    //failLoop = 0;
+                    //puts("[Create]: Attempting to save list to file.");
+                    if(!(exportFolOut = opendir("export"))){//If export folder doesn't exist
+                        if(!mkdir("export")){//Then attempt to make export folder
+                            if(!(exportFolOut = opendir("export"))){//If it still can't be opened..
+                                puts("[Create]: Export folder creation failed! Sorry, program exiting.");
+                                exit(EXIT_FAILURE);
+
+                            }
+
+                        }
+                        else{//If export folder can't be made..
+                            puts("[Create]: Export folder creation failed! Sorry, program exiting.");
+                            exit(EXIT_FAILURE);
+
+                        }
+
+                    }
+
+                    puts("[Create]: Export folder created, enter your filename. [Max 64 characters]");
+                    while(failLoop){
+                        fputs("Input: ", stdout);
+                        fgets(fileName, sizeof(fileName), stdin);
+                        i = 0;
+                        while(fileName[i] != '\0'){//While it's not the end of the string
+                            //printf("Current char: %c | Index: %d\n", fileName[i], i);
+                            if(fileName[i] == '\n'){//If newline character found..
+                                //printf("Found. | Index: %d", i);
+                                fileName[i] = '\0';//Change to null
+
+                            }
+
+                            i++;
+
+                        }
+
+                        printf("User entered: %s", fileName);
+                        if(!(exportFileOut = fopen(strcat(path, fileName), "w"))){
+                            puts("[Create]: File creation failed! Sorry, program exiting.");
+                            exit(EXIT_FAILURE);
+
+                        }
+
+                        puts("[Create]: File creation succeeded. Attempting to save list.");
+
+
+                    }
+
+                    //printf("Export folder pointer: %p\n", (void *)exportFolOut);
                     break;
 
                 case 'N': case 'n':
-                    puts("[Create]: Discarding current list.");
-                    //printf("Head value before: %p\n", *head);
+                    puts("[Create]: Discarding current list, and creating new list.");
+                    //printf("Head value before: %p\n", (void *)*head);
                     deleteList(head);
-                    //printf("Head value after: %p\n", *head);
-                    //failLoop = 0;
-                    break;
+                    //printf("Head value after: %p\n", (void *)*head);
+                    createList(head);
+                    return 0;
 
                 default:
                     puts("[Create]: Invalid input. Enter either Y or N.");
