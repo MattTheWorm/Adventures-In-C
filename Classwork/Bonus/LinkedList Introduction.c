@@ -72,22 +72,43 @@ void printHelp(){
 void createList(struct Part *head){
     //File Vars
     FILE *exportFileOut; //Export file out
-    DIE *exportFolOut; //Export folder out
-    char fileName[256], path[256] = "export/;
+    DIR *exportFolOut; //Export folder out
+    char fileName[65], path[128] = "export/";//Filename Size 64 characters
 
     //IO Vars
+    int failLoop = 1; //Validation var1
     char yesNo = 0;
 
-    if(!head){//If head is null, AKA head
+    if(!head){//If head is null, AKA no list
         puts("[Create]: No head pointer detected, assuming new list.");
 
     }
     else{
         puts("[Create]: List detected. Do you want to save the current list to file? [Y/N]");
-        fputs("Input: ", stdout);
-        yesNo = getchar();
-        while(getchar() != '\n'); //Clear buffer
-        getchar();
+        while(failLoop){
+            fputs("Input: ", stdout);
+            yesNo = getchar();
+            while(getchar() != '\n'); //Clear buffer
+
+            switch(yesNo){
+                case 'Y': case 'y':
+                    puts("User chose yes.");
+                    //failLoop = 0;
+                    break;
+
+                case 'N': case 'n':
+                    puts("Discarding current list.");
+                    //failLoop = 0;
+                    break;
+
+                default:
+                    puts("Invalid input. Enter either Y or N.");
+
+                //-----
+
+            }
+
+        }
 
     }
 
