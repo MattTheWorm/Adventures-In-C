@@ -23,6 +23,7 @@ struct Part{
 
 void printHelp();
 void deleteList(struct Part **head);
+void saveList(struct Part **head);
 int createList(struct Part **head);
 
 //End
@@ -88,15 +89,68 @@ void printHelp(){
 // saveList
 //////////
 void saveList(struct Part **head){
+    //File Vars
+    FILE *exportFileOut; //Export file out
+    DIR *exportFolOut; //Export folder out
+    char fileName[65], path[77] = "export/";//Filename Size 64 characters w/null 65 characters | export/ + .csv  + null + fileName = 77(?)
+
+    //IO Vars
+    int failLoop = 1, i; //Validation Var1
+
+    puts("[Save]: Save session started.");
+    if(!(exportFolOut = opendir("export"))){//If export folder doesn't exist
+        if(!mkdir("export")){//Then attempt to make export folder
+            if(!(exportFolOut = opendir("export"))){//If it still can't be opened..
+                puts("[Save]: Export folder creation failed! Sorry, program exiting.");
+                exit(EXIT_FAILURE);
+
+            }
+
+        }
+        else{//If export folder can't be made..
+            puts("[Save]: Export folder creation failed! Sorry, program exiting.");
+            exit(EXIT_FAILURE);
+
+        }
+
+    }
+
+    puts("[Save]: Export folder created, enter your filename. [Max 64 characters]");
+    while(failLoop){
+        fputs("Input: ", stdout);
+        fgets(fileName, sizeof(fileName), stdin);
+        i = 0;
+        while(fileName[i] != '\0'){//While it's not the end of the string
+            //printf("Current char: %c | Index: %d\n", fileName[i], i);
+            if(fileName[i] == '\n'){//If newline character found..
+                //printf("Found. | Index: %d", i);
+                fileName[i] = '\0';//Change to null
+
+            }
+
+            i++;
+
+        }
+
+        //printf("User entered: %s", fileName);
+        if(!(exportFileOut = fopen(strcat(strcat(path, fileName), ".csv"), "w"))){
+            puts("[Save]: File creation failed! Sorry, program exiting.");
+            exit(EXIT_FAILURE);
+
+        }
+
+    puts("[Save]: File creation succeeded. Attempting to save list.");
+    /*----------
+
+    LIST SAVING
+
+    ----------*/
 
 
 
+    }
 
-
-
-
-
-
+    //printf("Export folder pointer: %p\n", (void *)exportFolOut);
 
 }
 //////////
@@ -132,13 +186,7 @@ void deleteList(struct Part **head){
 // createList
 //////////
 int createList(struct Part **head){//0 Return success, else fail (for now).
-    //File Vars
-    FILE *exportFileOut; //Export file out
-    DIR *exportFolOut; //Export folder out
-    char fileName[65], path[76] = "export/";//Filename Size 64 characters
-
     //IO Vars
-    int failLoop = 1, i; //Validation Var1
     char yesNo = 0;
 
     if(!*head){//If head is null, AKA no list
@@ -155,54 +203,7 @@ int createList(struct Part **head){//0 Return success, else fail (for now).
 
             switch(yesNo){
                 case 'Y': case 'y':
-                    //puts("[Create]: Attempting to save list to file.");
-                    if(!(exportFolOut = opendir("export"))){//If export folder doesn't exist
-                        if(!mkdir("export")){//Then attempt to make export folder
-                            if(!(exportFolOut = opendir("export"))){//If it still can't be opened..
-                                puts("[Create]: Export folder creation failed! Sorry, program exiting.");
-                                exit(EXIT_FAILURE);
-
-                            }
-
-                        }
-                        else{//If export folder can't be made..
-                            puts("[Create]: Export folder creation failed! Sorry, program exiting.");
-                            exit(EXIT_FAILURE);
-
-                        }
-
-                    }
-
-                    puts("[Create]: Export folder created, enter your filename. [Max 64 characters]");
-                    while(failLoop){
-                        fputs("Input: ", stdout);
-                        fgets(fileName, sizeof(fileName), stdin);
-                        i = 0;
-                        while(fileName[i] != '\0'){//While it's not the end of the string
-                            //printf("Current char: %c | Index: %d\n", fileName[i], i);
-                            if(fileName[i] == '\n'){//If newline character found..
-                                //printf("Found. | Index: %d", i);
-                                fileName[i] = '\0';//Change to null
-
-                            }
-
-                            i++;
-
-                        }
-
-                        printf("User entered: %s", fileName);
-                        if(!(exportFileOut = fopen(strcat(path, fileName), "w"))){
-                            puts("[Create]: File creation failed! Sorry, program exiting.");
-                            exit(EXIT_FAILURE);
-
-                        }
-
-                        puts("[Create]: File creation succeeded. Attempting to save list.");
-
-
-                    }
-
-                    //printf("Export folder pointer: %p\n", (void *)exportFolOut);
+                    saveList(head);
                     break;
 
                 case 'N': case 'n':
