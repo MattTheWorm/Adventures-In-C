@@ -94,30 +94,30 @@ void saveList(struct Part **head){
 	    FILE *exportFileOut; //Export file out
 	    DIR *exportFolOut; //Export folder out
 	    char fileName[65], path[77] = "export/";//Filename Size 64 characters w/null 65 characters | export/ + .csv  + null + fileName = 77(?)
-	
+
 	    //IO Vars
 	    int i; //Validation Var1 & loop increment
-	
+
 	    puts("[Save]: Save session started.");
 	    if(!(exportFolOut = opendir("export"))){//If export folder doesn't exist
 	        if(!mkdir("export")){//Then attempt to make export folder
 	            if(!(exportFolOut = opendir("export"))){//If it still can't be opened..
 	                puts("[Save]: Export folder creation failed! Sorry, program exiting.");
 	                exit(EXIT_FAILURE);
-	
+
 	            }
-	
+
 	        }
 	        else{//If export folder can't be made..
 	            puts("[Save]: Export folder creation failed! Sorry, program exiting.");
 	            exit(EXIT_FAILURE);
-	
+
 	        }
-	
+
 	    }
-	
+
 	    puts("[Save]: Export folder created, enter your filename. [Max 64 characters]");
-	    
+
         fputs("Input: ", stdout);
         fgets(fileName, sizeof(fileName), stdin);
         i = 0;
@@ -142,9 +142,9 @@ void saveList(struct Part **head){
 
 	    puts("[Save]: File creation succeeded. Attempting to save list.");
 	    /*----------
-	
+
 	    LIST SAVING
-	
+
 	    ----------*/
 	    struct Part *temp = *head;
 	    i = 0;
@@ -153,27 +153,27 @@ void saveList(struct Part **head){
 	    	if(fprintf(exportFileOut, "%d,%d,%.2lf\n", temp->num, temp->quantity, temp->price)> 0){//num, quant, price
 				printf("\tPart Number: %d saved to file.\n", temp->num);
 				temp = temp->next;
-			
+
 	    	}
 	    	else{
 	    		puts("[Save]: One list member failed to save! Sorry, program exiting.");
 	    		exit(EXIT_FAILURE);
-	    		
+
 			}
-			
+
 			i++;
-	    	
+
 		}
 		puts("\n----------");
 		printf("[Save]: Save complete (%d parts saved). Check the exports folder.\n", i);
 		fclose(exportFileOut);
 		closedir(exportFolOut);
 	    //printf("Export folder pointer: %p\n", (void *)exportFolOut);
-	    
+
 	}
 	else{
 		printf("[Save]: No list exists to save!");
-		
+
 	}
 
 }
