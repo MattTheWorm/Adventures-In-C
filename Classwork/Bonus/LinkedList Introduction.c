@@ -7,7 +7,6 @@ Desc: LinkedList bonus assignment.
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
-#include <string.h>
 //Structure Declaration
 
 struct Part{
@@ -23,7 +22,6 @@ struct Part{
 //Function Declaration
 
 void printHelp();
-<<<<<<< HEAD
 void deleteList(struct Part **head);
 void saveList(struct Part **head);
 int createList(struct Part **head);
@@ -52,18 +50,6 @@ int main(){
     puts("LinkedList session begin.");
     printHelp();
     createList(&head);
-=======
-void createList(struct Part *head);
-
-//End
-int main(){
-    struct Part Part1 = {10, 10, 9.99, NULL};
-    struct Part *head = &Part1;
-
-    puts("[Main]: LinkedList session begin.\n");
-    printHelp();
-    createList(head);
->>>>>>> master
     return 0;
 
 }
@@ -199,30 +185,17 @@ void deleteList(struct Part **head){
 //////////
 // createList
 //////////
-<<<<<<< HEAD
 int createList(struct Part **head){//0 Return success, else fail (for now).
     //IO Vars
     char yesNo = 0;
 
     if(!*head){//If head is null, AKA no list
-=======
-void createList(struct Part *head){
-    //File Vars
-    FILE *exportFileOut; //Export file pointer
-    DIR *exportFolOut; //Export folder pointer
-    char fileName[128], path[137] = "exports/";
-    //IO Vars
-    char yesNo;
-
-    if(!head){//If list head exists (AKA list exists)
->>>>>>> master
         puts("[Create]: No head pointer detected, assuming new list.");
         return 0;
 
     }
     else{
         puts("[Create]: List detected. Do you want to save the current list to file? [Y/N]");
-<<<<<<< HEAD
         while(1){
             fputs("Input: ", stdout);
             yesNo = getchar();
@@ -247,16 +220,11 @@ void createList(struct Part *head){
                 //-----
 
             }
-=======
-        fputs("Input: ", stdin);
-        yesNo = getchar();
-        while(getchar() != '\n'); //Clear buffer
-        getchar();
->>>>>>> master
 
         }
 
     }
+
 }
 
 //End of program []
