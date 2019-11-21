@@ -91,16 +91,29 @@ void printHelp(){
 }
 
 //////////
-// selectPrint | Prints specific part based on part number | WIP
+// selectPrint | Prints specific part based on part number | Updating
 //////////
 int selectPrint(struct Part **head){
     if(*head){
         //Misc Vars
         struct Part *temp = *head;
-        int i, partNum = 3;
+        int i, partNum;
 
         puts("[Select]: Enter the Part number you wish to print.");
-        fputs("Input: ", stdout);
+        while(1){
+            fputs("Input: ", stdout);
+            if(!(scanf("%d", &partNum))){//If scanf does NOT have match..
+                while(getchar() != '\n'); //Clear buffer
+                puts("[Select]: Invalid input. Try again.");
+                continue;
+
+            }
+
+            while(getchar() != '\n'); //Clear buffer
+            break;
+
+        }
+
         printf("[Select]: Searching for Part number %d.\n", partNum);
         i = 0;
         while(temp){
@@ -119,7 +132,7 @@ int selectPrint(struct Part **head){
 
     }
     else{
-        puts("[Select]: The list doesn't exist to print a part from!");
+        puts("[Select]: No list currently exists to print a part from!");
 
     }
 
@@ -149,14 +162,14 @@ void printList(struct Part **head){
 
     }
     else{
-        puts("[Print]: No list exists to print!");
+        puts("[Print]: No list currently exists to print!");
 
     }
 
 }
 
 //////////
-// saveList | Saves the list to file |  WIP
+// saveList | Saves the list to file |  Updating
 //////////
 void saveList(struct Part **head){
     if(head){//If head exists..
@@ -245,7 +258,7 @@ void saveList(struct Part **head){
 
 	}
 	else{
-		printf("[Save]: No list exists to save!");
+		printf("[Save]: No list currently exists to save!");
 
 	}
 
@@ -275,7 +288,7 @@ void deleteList(struct Part **head){
 
     }
     else{
-        puts("[Delete]: List doesn't exist!");
+        puts("[Delete]: No list exists currently to delete!");
 
     }
 
