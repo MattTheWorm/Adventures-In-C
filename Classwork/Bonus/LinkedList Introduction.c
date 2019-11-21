@@ -22,6 +22,8 @@ struct Part{
 //Function Declaration
 
 void printHelp();
+int selectPrint(struct Part **head);
+void printList(struct Part **head);
 void deleteList(struct Part **head);
 void saveList(struct Part **head);
 int createList(struct Part **head);
@@ -49,6 +51,8 @@ int main(){
 
     puts("LinkedList session begin.");
     printHelp();
+    selectPrint(&head);
+    printList(&head);
     createList(&head);
     return 0;
 
@@ -85,18 +89,87 @@ void printHelp(){
     putchar('\n');
 
 }
+
 //////////
-// saveList
+// selectPrint | Prints specific part based on part number | WIP
+//////////
+int selectPrint(struct Part **head){
+    if(*head){
+        //Misc Vars
+        struct Part *temp = *head;
+        int i, partNum = 3;
+
+        puts("[Select]: Enter the Part number you wish to print.");
+        fputs("Input: ", stdout);
+        printf("[Select]: Searching for Part number %d.\n", partNum);
+        i = 0;
+        while(temp){
+            if(temp->num == partNum){
+                printf("[Select]: Part Number %d found at index %d.\n", partNum, i);
+                puts("----------\n");//10 Dashes
+                printf("\tPart Number: %d | Part Quantity: %d | Part Price: $%.2lf\n", temp->num, temp->quantity, temp->price);
+                puts("\n----------");//10 Dashes
+                return 1;//Success
+
+            }
+            temp = temp->next;
+            i++;
+        }
+        puts("[Select]: Part not found.");
+
+    }
+    else{
+        puts("[Select]: The list doesn't exist to print a part from!");
+
+    }
+
+}
+
+//////////
+// printList | Prints the entire list from head to tail | Updating
+//////////
+void printList(struct Part **head){
+    if(*head){
+        //Misc Vars
+        struct Part *temp = *head;
+        int i;
+
+        puts("[Print]: List found. Printing items.");
+        puts("----------\n");//10 Dashes
+        i = 0;
+        while(temp){
+          printf("\t[%d] Part Number: %d | Part Quantity: %d | Part Price: $%.2lf\n", i + 1, temp->num, temp->quantity, temp->price);
+          temp = temp->next;
+          i++;
+
+        }
+
+        puts("\n----------");//10 Dashes
+        puts("[Print]: Print complete.");
+
+    }
+    else{
+        puts("[Print]: No list exists to print!");
+
+    }
+
+}
+
+//////////
+// saveList | Saves the list to file |  WIP
 //////////
 void saveList(struct Part **head){
     if(head){//If head exists..
+		//Misc Vars
+		int i; //Validation Var1 & loop increment
+
 		//File Vars
 	    FILE *exportFileOut; //Export file out
 	    DIR *exportFolOut; //Export folder out
 	    char fileName[65], path[77] = "export/";//Filename Size 64 characters w/null 65 characters | export/ + .csv  + null + fileName = 77(?)
 
 	    //IO Vars
-	    int i; //Validation Var1 & loop increment
+	    int foundNewLine; //fgets related
 
 	    puts("[Save]: Save session started.");
 	    if(!(exportFolOut = opendir("export"))){//If export folder doesn't exist
@@ -177,8 +250,9 @@ void saveList(struct Part **head){
 	}
 
 }
+
 //////////
-// deleteList
+// deleteList | Deletes the entire list from head to tail | Updating
 //////////
 void deleteList(struct Part **head){
     if(*head){ //If head exists
@@ -206,10 +280,11 @@ void deleteList(struct Part **head){
     }
 
 }
+
 //////////
-// createList
+// createList | Creates a new list. If the list exists, attempt to save. | WIP
 //////////
-int createList(struct Part **head){//0 Return success, else fail (for now).
+int createList(struct Part **head){//1 Return success, else fail (for now).
     //IO Vars
     char yesNo = 0;
 
@@ -228,7 +303,7 @@ int createList(struct Part **head){//0 Return success, else fail (for now).
             switch(yesNo){
                 case 'Y': case 'y':
                     saveList(head);
-                    return 0;//temp
+                    return 1;//temp
                     break;
 
                 case 'N': case 'n':
@@ -237,7 +312,7 @@ int createList(struct Part **head){//0 Return success, else fail (for now).
                     deleteList(head);
                     //printf("Head value after: %p\n", (void *)*head);
                     createList(head);
-                    return 0;
+                    return 1;
 
                 default:
                     puts("[Create]: Invalid input. Enter either Y or N.");
