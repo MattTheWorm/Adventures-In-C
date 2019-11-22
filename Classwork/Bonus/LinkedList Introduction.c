@@ -22,6 +22,9 @@ struct Part{
 //Function Declaration
 
 void printHelp();
+void insertStructure(struct Part **head);
+struct Part * partSearch(struct Part **head, int partNum, char funcName[]);
+int deleteStructure(struct Part **head);
 int selectPrint(struct Part **head);
 void printList(struct Part **head);
 void deleteList(struct Part **head);
@@ -32,15 +35,15 @@ int createList(struct Part **head);
 int main(){
     //Parts
     struct Part *Part1 = (struct Part *)malloc(sizeof(struct Part));
-    Part1->num = 1;
+    Part1->num = 2;
     Part1->quantity = 11;
     Part1->price = 1.11;
     struct Part *Part2 = (struct Part *)malloc(sizeof(struct Part));
-    Part2->num = 2;
+    Part2->num = 4;
     Part2->quantity = 22;
     Part2->price = 2.22;
     struct Part *Part3 = (struct Part *)malloc(sizeof(struct Part));
-    Part3->num = 3;
+    Part3->num = 6;
     Part3->quantity = 33;
     Part3->price = 3.33;
     //Head/Next
@@ -51,6 +54,8 @@ int main(){
 
     puts("LinkedList session begin.");
     printHelp();
+    insertStructure(&head);
+    deleteStructure(&head);
     selectPrint(&head);
     printList(&head);
     createList(&head);
@@ -89,6 +94,214 @@ void printHelp(){
     putchar('\n');
 
 }
+//////////
+// partSearch | Searches for a part by number and returns the pointer to the part struct if it exists. | Updating
+//////////
+struct Part * partSearch(struct Part **head, int partNum, char funcName[]){
+    //Misc Vars
+    struct Part *temp = *head;
+    int i;
+
+    i = 0;
+    if(funcName){
+       printf("[%s]: Searching for Part number %d.\n", funcName, partNum);
+
+    }
+
+    while(temp){
+        if(temp->num == partNum){
+            if(funcName){
+                printf("[%s]: Part Number %d found at index %d.\n", funcName, partNum, i);
+
+            }
+
+            return temp;
+
+        }
+
+        temp = temp->next;
+        i++;
+
+    }
+
+    if(funcName){
+        printf("[%s]: Part not found.\n", funcName);
+
+    }
+
+    return NULL;
+
+};
+
+//////////
+// insertStructure | Inserts a part by number into the linked list. | WIP
+//////////
+void insertStructure(struct Part **head){
+    //Misc Vars
+    struct Part *next = NULL;
+    struct Part *temp = *head;
+    int i, skipLoop = 0;
+
+    //Part Related
+    int partNum, partQuan;
+    double partPrice;
+    struct Part *partPointer = NULL;
+
+
+    puts("[Insert]: Enter the Part Number.");
+    while(1){
+        fputs("Input: ", stdout);
+        if(!(scanf("%d", &partNum))){//If scanf does NOT have match..
+            while(getchar() != '\n'); //Clear buffer
+            puts("[Insert]: Invalid input. Try again.");
+            continue;
+
+        }
+
+        if(partSearch(head, partNum, 0)){//If the part number is found..
+            puts("[Insert]: That part number already exists. Try again.");
+            continue;
+
+        }
+
+        while(getchar() != '\n'); //Clear buffer
+        break;
+
+
+    }
+
+    puts("[Insert]: Enter the Part Quantity.");
+    while(1){
+        fputs("Input: ", stdout);
+        if(!(scanf("%d", &partQuan))){//If scanf does NOT have match..
+            while(getchar() != '\n'); //Clear buffer
+            puts("[Insert]: Invalid input. Try again.");
+            continue;
+
+        }
+
+        while(getchar() != '\n'); //Clear buffer
+        break;
+
+    }
+
+    puts("[Insert]: Enter the Part Price.");
+    while(1){
+        fputs("Input: ", stdout);
+        if(!(scanf("%lf", &partPrice))){//If scanf does NOT have match..
+            while(getchar() != '\n'); //Clear buffer
+            puts("[Insert]: Invalid input. Try again.");
+            continue;
+
+        }
+
+        while(getchar() != '\n'); //Clear buffer
+        break;
+
+    }
+
+    if(!(partPointer = (struct Part *)malloc(sizeof(struct Part)))){
+        puts("[Insert]: Part creation failed (out of memory)! Sorry, program exiting.");
+        exit(EXIT_FAILURE);
+
+    }
+    partPointer->num = partNum;
+    partPointer->quantity = partQuan;
+    partPointer->price = partPrice;
+    partPointer->next = NULL;
+
+    if(!(*head)){
+        puts("Skipped loop.");
+        *head = partPointer;
+        skipLoop = 1;
+
+    }
+
+    if(!skipLoop){
+        i = 1; //Since head is included.
+        while(temp){
+            //printf("Current pNum: %d | Next pNum: %d\n", temp->num, temp->next->num);
+            if((temp->num < partPointer->num) && (!(temp->next) || partPointer->num < temp->next->num)){//Basically if --> Less < Part < Greater(or doesn't exist)
+                partPointer->next = temp->next;
+                temp->next = partPointer;
+                printf("Current partPointer: %d | Next partPointer: %p\n", partPointer->num, partPointer->next);
+                break;
+
+            }
+
+            temp = temp->next;
+            i++;
+
+        }
+
+    }
+
+    printf("[Insert]: Part Number %d inserted into the list at index %d.\n", partNum, i);
+
+}
+
+//////////
+// deleteStructure | Deletes a stucture and fixes list connections | Updating
+//////////
+int deleteStructure(struct Part **head){
+if(*head){
+        //Misc Vars
+        struct Part *previous = NULL;
+        struct Part *next = NULL;
+        struct Part *temp = *head;
+        int i;
+
+        //Part Related
+        int partNum;
+
+        puts("[Delete]: Enter the Part number you wish to delete.");
+        while(1){
+            fputs("Input: ", stdout);
+            if(!(scanf("%d", &partNum))){//If scanf does NOT have match..
+                while(getchar() != '\n'); //Clear buffer
+                puts("[Delete]: Invalid input. Try again.");
+                continue;
+
+            }
+
+            while(getchar() != '\n'); //Clear buffer
+            break;
+
+        }
+
+        printf("[Delete]: Searching for Part number %d.\n", partNum);
+        i = 0;
+        while(temp){
+            if(temp->num == partNum){
+                if(previous){//If previous structure in list exists..
+                    previous->next = temp->next;//Then the previous structure's next pointer now points to the structure the current structure points to (since it will be deleted)
+
+                }
+                else{//If there is no previous structure..
+                    *head = temp->next;//Then the target structure must be the head, and thus the next structure is now the head.
+
+                }
+                free(temp);
+                printf("[Delete]: Part Number %d found and deleted at index %d.\n", partNum, i);
+                return 1;//Success
+
+            }
+
+            previous = temp;
+            temp = temp->next;
+            i++;
+
+        }
+
+        puts("[Delete]: Part not found.");
+
+    }
+    else{
+        puts("[Delete]: No list currently exists to delete a part from!");
+
+    }
+
+}
 
 //////////
 // selectPrint | Prints specific part based on part number | Updating
@@ -96,8 +309,10 @@ void printHelp(){
 int selectPrint(struct Part **head){
     if(*head){
         //Misc Vars
-        struct Part *temp = *head;
-        int i, partNum;
+        struct Part *target = NULL;
+
+        //Part Related
+        int partNum;
 
         puts("[Select]: Enter the Part number you wish to print.");
         while(1){
@@ -114,21 +329,12 @@ int selectPrint(struct Part **head){
 
         }
 
-        printf("[Select]: Searching for Part number %d.\n", partNum);
-        i = 0;
-        while(temp){
-            if(temp->num == partNum){
-                printf("[Select]: Part Number %d found at index %d.\n", partNum, i);
-                puts("----------\n");//10 Dashes
-                printf("\tPart Number: %d | Part Quantity: %d | Part Price: $%.2lf\n", temp->num, temp->quantity, temp->price);
-                puts("\n----------");//10 Dashes
-                return 1;//Success
+        if(target = partSearch(head, partNum, "Select")){
+            puts("----------\n");//10 Dashes
+            printf("\tPart Number: %d | Part Quantity: %d | Part Price: $%.2lf\n", target->num, target->quantity, target->price);
+            puts("\n----------");//10 Dashes
 
-            }
-            temp = temp->next;
-            i++;
         }
-        puts("[Select]: Part not found.");
 
     }
     else{
@@ -151,7 +357,7 @@ void printList(struct Part **head){
         puts("----------\n");//10 Dashes
         i = 0;
         while(temp){
-          printf("\t[%d] Part Number: %d | Part Quantity: %d | Part Price: $%.2lf\n", i + 1, temp->num, temp->quantity, temp->price);
+          printf("\t[%d] Part Number: %d | Part Quantity: %d | Part Price: $%.2lf\n", i, temp->num, temp->quantity, temp->price);
           temp = temp->next;
           i++;
 
@@ -169,7 +375,7 @@ void printList(struct Part **head){
 }
 
 //////////
-// saveList | Saves the list to file |  Updating
+// saveList | Saves the list to file | Updating
 //////////
 void saveList(struct Part **head){
     if(head){//If head exists..
