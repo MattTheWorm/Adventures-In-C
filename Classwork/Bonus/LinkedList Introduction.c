@@ -22,12 +22,13 @@ struct Part{
 //Function Declaration
 
 void printHelp();
+void exitProgram(struct Part **head);
 void inputLoop(char request[], char funcName[], int *valuePointerInt, double *valuePointerLF, int mode);
 struct Part * partSearch(struct Part **head, int partNum, char funcName[]);
 void modifyStructure(struct Part **head);
-void insertStructure(struct Part **head);
-int deleteStructure(struct Part **head);
-int selectPrint(struct Part **head);
+void insertStructure(struct Part **head, char funcName[]);
+void deleteStructure(struct Part **head);
+void selectPrint(struct Part **head);
 void printList(struct Part **head);
 void deleteList(struct Part **head);
 void saveList(struct Part **head);
@@ -56,12 +57,14 @@ int main(){
 
     puts("LinkedList session begin.");
     printHelp();
-    insertStructure(&head);
-    modifyStructure(&head);
-    deleteStructure(&head);
-    selectPrint(&head);
-    printList(&head);
+//    insertStructure(&head, "Insert");
+//    modifyStructure(&head);
+//    deleteStructure(&head);
+//    selectPrint(&head);
+//    printList(&head);
     createList(&head);
+    printList(&head);
+    exitProgram(&head);
     return 0;
 
 }
@@ -99,17 +102,63 @@ void printHelp(){
 }
 
 //////////
+// exitProgram | Exits the program. If there's a list prompts to save. | WIP
+//////////
+void exitProgram(struct Part **head){
+    //IO Vars
+    char yesNo = 0;
+
+    if(!(*head)){
+        puts("Program will now exit..");
+        exit(EXIT_SUCCESS);
+
+    }
+    else{
+        puts("[Exit]: List detected. Do you want to save the current list to file? [Y/N/C]");
+        while(1){
+            fputs("Input: ", stdout);
+            yesNo = getchar();
+            while(getchar() != '\n'); //Clear buffer
+
+            switch(yesNo){
+                case 'Y': case 'y':
+                    saveList(head);
+                    puts("Program will now exit..");
+                    exit(EXIT_SUCCESS);
+
+                case 'N': case 'n':
+                    puts("Program will now exit..");
+                    exit(EXIT_SUCCESS);
+
+                case 'C': case 'c':
+                    puts("[Exit]: Exit canceled.");
+                    return;
+
+                default:
+                    puts("[Exit]: Invalid input. Enter either Y, N or C (for cancel).");
+
+                //---
+
+            }
+
+        }
+
+    }
+
+}
+
+//////////
 // inputLoop | Gets user input (float/int) and loops until the value is valid. | Updating
 //////////
 void inputLoop(char request[], char funcName[], int *valuePointerInt, double *valuePointerLF, int mode){//Mode 1 - Int | Mode 2 - Double
-    puts(request);
+    printf("[%s]: %s\n", funcName, request);
     while(1){
         fputs("Input: ", stdout);
         switch(mode){
             case 1:
                 if(!(scanf("%d", valuePointerInt))){//If scanf does NOT have match..
                     while(getchar() != '\n'); //Clear buffer
-                    printf("[%s]: Invalid input. Try again.");
+                    printf("[%s]: Invalid input. Try again.\n", funcName);
                     continue;
 
                 }
@@ -118,7 +167,7 @@ void inputLoop(char request[], char funcName[], int *valuePointerInt, double *va
             case 2:
                 if(!(scanf("%lf", valuePointerLF))){//If scanf does NOT have match..
                     while(getchar() != '\n'); //Clear buffer
-                    printf("[%s]: Invalid input. Try again.");
+                    printf("[%s]: Invalid input. Try again.\n", funcName);
                     continue;
 
                 }
@@ -186,13 +235,11 @@ void modifyStructure(struct Part **head){
         double partPrice;
         struct Part *partPointer = NULL;
 
-        inputLoop("[Modify]: Enter the Part number you wish to modify.", "Modify", &partNum, 0, 1);
+        inputLoop("Enter the Part number you wish to modify.", "Modify", &partNum, 0, 1);
         if(partPointer = partSearch(head, partNum, "Modify")){
-            puts("----------\n");//10 Dashes
             inputLoop("Enter new Part quantity.", "Modify", &partPointer->quantity, 0, 1);
             inputLoop("Enter new Part price.", "Modify", 0, &partPointer->price, 2);
-            printf("\tPart Number: %d | Part Quantity: %d | Part Price: $%.2lf\n", partPointer->num, partPointer->quantity, partPointer->price);
-            puts("\n----------");//10 Dashes
+            printf("[Modify]: Part Number: %d | Part Quantity: %d | Part Price: $%.2lf\n", partPointer->num, partPointer->quantity, partPointer->price);
 
         }
 
@@ -205,9 +252,9 @@ void modifyStructure(struct Part **head){
 }
 
 //////////
-// insertStructure | Inserts a part by number into the linked list. | Updating
+// insertStructure | Inserts a part by number into the linked list. Sorts it into the appropriate position. | Updating
 //////////
-void insertStructure(struct Part **head){
+void insertStructure(struct Part **head, char funcName[]){
     //Misc Vars
     struct Part *temp = *head;
     int i, skipLoop = 0;
@@ -218,18 +265,18 @@ void insertStructure(struct Part **head){
     struct Part *partPointer = NULL;
 
 
-    puts("[Insert]: Enter the Part Number.");
+    printf("[%s]: Enter the Part Number.\n", funcName);
     while(1){
         fputs("Input: ", stdout);
         if(!(scanf("%d", &partNum))){//If scanf does NOT have match..
             while(getchar() != '\n'); //Clear buffer
-            puts("[Insert]: Invalid input. Try again.");
+            printf("[%s]: Invalid input. Try again.\n", funcName);
             continue;
 
         }
 
         if(partSearch(head, partNum, 0)){//If the part number is found..
-            puts("[Insert]: That part number already exists. Try again.");
+            printf("[%s]: That part number already exists. Try again.\n", funcName);
             continue;
 
         }
@@ -240,38 +287,10 @@ void insertStructure(struct Part **head){
 
     }
 
-    puts("[Insert]: Enter the Part Quantity.");
-    while(1){
-        fputs("Input: ", stdout);
-        if(!(scanf("%d", &partQuan))){//If scanf does NOT have match..
-            while(getchar() != '\n'); //Clear buffer
-            puts("[Insert]: Invalid input. Try again.");
-            continue;
-
-        }
-
-        while(getchar() != '\n'); //Clear buffer
-        break;
-
-    }
-
-    puts("[Insert]: Enter the Part Price.");
-    while(1){
-        fputs("Input: ", stdout);
-        if(!(scanf("%lf", &partPrice))){//If scanf does NOT have match..
-            while(getchar() != '\n'); //Clear buffer
-            puts("[Insert]: Invalid input. Try again.");
-            continue;
-
-        }
-
-        while(getchar() != '\n'); //Clear buffer
-        break;
-
-    }
-
+    inputLoop("Enter the Part Quantity.", funcName, &partQuan, 0, 1);
+    inputLoop("Enter the Part Price.", funcName, 0, &partPrice, 2);
     if(!(partPointer = (struct Part *)malloc(sizeof(struct Part)))){
-        puts("[Insert]: Part creation failed (out of memory)! Sorry, program exiting.");
+        printf("[%s]: Part creation failed (out of memory)! Sorry, program exiting.", funcName);
         exit(EXIT_FAILURE);
 
     }
@@ -283,7 +302,16 @@ void insertStructure(struct Part **head){
 
     if(!(*head)){
         i = 0;
-        //puts("Skipped loop.");
+        puts("Skipped loop. (No head detected)");
+        *head = partPointer;
+        skipLoop = 1;
+
+    }
+
+    if(partPointer->num < (*head)->num){
+        i = 0;
+        puts("Skipped loop. (New part num is less than head)");
+        partPointer->next = *head;
         *head = partPointer;
         skipLoop = 1;
 
@@ -308,39 +336,25 @@ void insertStructure(struct Part **head){
 
     }
 
-    printf("[Insert]: Part Number %d inserted into the list at index %d.\n", partNum, i);
+    printf("[%s]: Part Number %d inserted into the list at index %d.\n", funcName, partNum, i);
 
 }
 
 //////////
 // deleteStructure | Deletes a stucture and fixes list connections | Updating
 //////////
-int deleteStructure(struct Part **head){
-if(*head){
+void deleteStructure(struct Part **head){
+    if(*head){
         //Misc Vars
         struct Part *previous = NULL;
         struct Part *next = NULL;
         struct Part *temp = *head;
-        int i;
+        int i, found;
 
         //Part Related
         int partNum;
 
-        puts("[Delete]: Enter the Part number you wish to delete.");
-        while(1){
-            fputs("Input: ", stdout);
-            if(!(scanf("%d", &partNum))){//If scanf does NOT have match..
-                while(getchar() != '\n'); //Clear buffer
-                puts("[Delete]: Invalid input. Try again.");
-                continue;
-
-            }
-
-            while(getchar() != '\n'); //Clear buffer
-            break;
-
-        }
-
+        inputLoop("Enter the Part number you wish to delete.", "Delete", &partNum, 0, 1);
         printf("[Delete]: Searching for Part number %d.\n", partNum);
         i = 0;
         while(temp){
@@ -355,7 +369,7 @@ if(*head){
                 }
                 free(temp);
                 printf("[Delete]: Part Number %d found and deleted at index %d.\n", partNum, i);
-                return 1;//Success
+                return;
 
             }
 
@@ -376,9 +390,9 @@ if(*head){
 }
 
 //////////
-// selectPrint | Prints specific part based on part number | Updating
+// selectPrint | Prints a specific part based on part number | Updating
 //////////
-int selectPrint(struct Part **head){
+void selectPrint(struct Part **head){
     if(*head){
         //Misc Vars
         struct Part *partPointer = NULL;
@@ -386,21 +400,7 @@ int selectPrint(struct Part **head){
         //Part Related
         int partNum;
 
-        puts("[Select]: Enter the Part number you wish to print.");
-        while(1){
-            fputs("Input: ", stdout);
-            if(!(scanf("%d", &partNum))){//If scanf does NOT have match..
-                while(getchar() != '\n'); //Clear buffer
-                puts("[Select]: Invalid input. Try again.");
-                continue;
-
-            }
-
-            while(getchar() != '\n'); //Clear buffer
-            break;
-
-        }
-
+        inputLoop("Enter the Part number you wish to print.", "Print", &partNum, 0, 1);
         if(partPointer = partSearch(head, partNum, "Select")){
             puts("----------\n");//10 Dashes
             printf("\tPart Number: %d | Part Quantity: %d | Part Price: $%.2lf\n", partPointer->num, partPointer->quantity, partPointer->price);
@@ -457,7 +457,7 @@ void saveList(struct Part **head){
 		//File Vars
 	    FILE *exportFileOut; //Export file out
 	    DIR *exportFolOut; //Export folder out
-	    char fileName[65], path[77] = "export/";//Filename Size 64 characters w/null 65 characters | export/ + .csv  + null + fileName = 77(?)
+	    char fileName[65], path[77] = "export/";//export/ (7) + .csv (4)  + null (1) + fileName (64) = 77(?)
 
 	    //IO Vars
 	    int foundNewLine; //fgets related
@@ -480,15 +480,13 @@ void saveList(struct Part **head){
 
 	    }
 
-	    puts("[Save]: Export folder created, enter your filename. [Max 64 characters]");//For now, assume user doesn't exceed 64 character limit.
-
+        //For now, assume user doesn't exceed 64 character limit.
+	    puts("[Save]: Export folder created, enter your filename. [Max 64 characters]");
         fputs("Input: ", stdout);
         fgets(fileName, sizeof(fileName), stdin);
         i = 0;
         while(fileName[i] != '\0'){//While it's not the end of the string
-            //printf("Current char: %c | Index: %d\n", fileName[i], i);
             if(fileName[i] == '\n'){//If newline character found..
-                //printf("Found. | Index: %d", i);
                 fileName[i] = '\0';//Change to null
 
             }
@@ -498,6 +496,7 @@ void saveList(struct Part **head){
         }
 
         //printf("User entered: %s", fileName);
+        //printf("File Path: %s", strcat(strcat(path, fileName), ".csv"));
         if(!(exportFileOut = fopen(strcat(strcat(path, fileName), ".csv"), "w"))){
             puts("[Save]: File creation failed! Sorry, program exiting.");
             exit(EXIT_FAILURE);
@@ -573,19 +572,43 @@ void deleteList(struct Part **head){
 }
 
 //////////
-// createList | Creates a new list. If the list exists, attempt to save. | WIP
+// createList | Creates a new list. If the list exists, attempt to save. | Updating
 //////////
 int createList(struct Part **head){//1 Return success, else fail (for now).
     //IO Vars
     char yesNo = 0;
 
-    if(!*head){//If head is null, AKA no list
-        puts("[Create]: No head pointer detected, assuming new list.");
-        return 0;
+    if(!(*head)){//If head is null, AKA no list
+        puts("[Create]: Creating new list.");
+        insertStructure(head, "Create");
+        while(1){
+            puts("[Create]: Do you want to make another part? [Y/N]");
+            fputs("Input: ", stdout);
+            yesNo = getchar();
+            while(getchar() != '\n'); //Clear buffer
+            switch(yesNo){
+                case 'Y': case 'y':
+                    insertStructure(head, "Create");
+                    break;
+
+                case 'N': case 'n':
+                    puts("[Create]: List creation complete.");
+                    return 1;
+
+                default:
+                    puts("[Create]: Invalid input. Enter either Y or N.");
+
+                //---
+
+            }
+
+        }
+
+        return 1;
 
     }
     else{
-        puts("[Create]: List detected. Do you want to save the current list to file? [Y/N]");
+        puts("[Create]: List detected. Do you want to save the current list to file? [Y/N/C]");
         while(1){
             fputs("Input: ", stdout);
             yesNo = getchar();
@@ -594,19 +617,22 @@ int createList(struct Part **head){//1 Return success, else fail (for now).
             switch(yesNo){
                 case 'Y': case 'y':
                     saveList(head);
+                    deleteList(head);
+                    createList(head);
                     return 1;//temp
-                    break;
 
                 case 'N': case 'n':
-                    puts("[Create]: Discarding current list, and creating new list.");
-                    //printf("Head value before: %p\n", *head);
                     deleteList(head);
-                    //printf("Head value after: %p\n", *head);
+                    puts("[Create]: Discarded current list.");
                     createList(head);
                     return 1;
 
+                case 'C': case 'c':
+                    puts("[Create]: List creation canceled.");
+                    return 1;
+
                 default:
-                    puts("[Create]: Invalid input. Enter either Y or N.");
+                    puts("[Create]: Invalid input. Enter either Y, N or C (for cancel).");
 
                 //---
 
