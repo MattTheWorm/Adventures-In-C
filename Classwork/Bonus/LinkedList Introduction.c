@@ -65,7 +65,7 @@ int main(){
 //    deleteStructure(&head);
 //    selectPrint(&head);
 //    printList(&head);
-    createList(&head);
+//    createList(&head);
     printList(&head);
     exitProgram(&head);
     return 0;
@@ -160,27 +160,47 @@ void importList(struct Part **head){
 
     }
 
-    puts("[Save]: File read successfully. Attempting to import list.");
+    puts("[Import]: File read successfully. Attempting to import list.");
     /*----------
 
     LIST IMPORT
 
     ----------*/
     //Part Related
-    struct Part *temp = *head;
-    int partNum, partQuan;
-    double partPrice;
+    struct Part *tempPartPointer = NULL;
 
     //IO Vars
-    char fileLine[128];
+    char fileLine[129], token[32];
 
     i = 0;
     x = 0;
     puts("----------\n");//10 Dashes
-    while(fgets(fileLine, sizeof(fileLine), importFileIn)){//For now, assume files don't have invalid part types
+    while(fgets(fileLine, sizeof(fileLine), importFileIn)){//For now, assume files don't have invalid part data types
         //PartNum | Quantity | Price
-        printf("Line data: %s", fileLine);
+        //PartNum
+        tempPartPointer = (struct Part *)malloc(sizeof(struct Part));
+        strcpy(token, strtok(fileLine, ","));
+        tempPartPointer->num = atoi(token);
+        if(partSearch(head, tempPartPointer->num, 0)){
+            printf("Part %d already exists. Import failed.\n", tempPartPointer->num);
+            free(tempPartPointer);
+            x++;
+            continue;
 
+        }
+
+        //Part Quant
+        strcpy(token, strtok(NULL, ","));
+        tempPartPointer->quantity = atoi(token);
+
+        //Part Price
+        strcpy(token, strtok(NULL, "\n"));
+        tempPartPointer->price = atof(token);
+
+        printf("Imported Part Number %d\n", tempPartPointer->num);
+        printf("Part Number %d | Part Quan: %d | Part Price: %lf\n", tempPartPointer->num, tempPartPointer->quantity, tempPartPointer->price);
+        insertPart(head, tempPartPointer, "Import");
+        i++;
 
     }
     puts("\n----------");
