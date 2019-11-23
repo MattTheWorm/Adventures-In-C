@@ -21,13 +21,13 @@ struct Part{
 //End
 //Function Declaration
 
-int createList(struct Part **head, int *savePointer);
+void createList(struct Part **head, int *savePointer);
 void printList(struct Part **head);
 void selectPrint(struct Part **head);
 void modifyStructure(struct Part **head);
 void deleteStructure(struct Part **head);
 void insertValidation(struct Part **head, char funcName[]);
-void saveList(struct Part **head, int *savePointer);
+void saveList(struct Part **head);
 void importList(struct Part **head);
 void exitProgram(struct Part **head, int *savePointer);
 void printHelp();
@@ -36,6 +36,7 @@ void inputLoop(char request[], char funcName[], int *valuePointerInt, double *va
 struct Part * partSearch(struct Part **head, int partNum, char funcName[]);
 void insertPart(struct Part **head, struct Part *partPointer, char funcName[]);
 void deleteList(struct Part **head);
+void emergencySave(struct Part **head);
 
 //End
 int main(){
@@ -105,7 +106,8 @@ int main(){
 
         }
         else if(!(strcmp(userInput, "save"))){ //Save
-            saveList(&head, &save);
+            saveList(&head);
+            save = 1;
 
         }
         else if(!(strcmp(userInput, "add")) || !(strcmp(userInput, "import"))){ //Add
@@ -296,7 +298,7 @@ void exitProgram(struct Part **head, int *savePointer){
 
             switch(yesNo){
                 case 'Y': case 'y':
-                    saveList(head, savePointer);
+                    saveList(head);
                     puts("Program will now exit..");
                     exit(EXIT_SUCCESS);
 
@@ -358,7 +360,7 @@ void inputLoop(char request[], char funcName[], int *valuePointerInt, double *va
 }
 
 //////////
-// partSearch | Searches for a part by number and returns the pointer to the part struct if it exists. | Updating
+// partSearch | Searches for a part by number and returns the pointer to the part struct if it exists. | Done
 //////////
 struct Part * partSearch(struct Part **head, int partNum, char funcName[]){
     //Misc Vars
@@ -481,9 +483,6 @@ void insertPart(struct Part **head, struct Part *partPointer, char funcName[]){
 // insertValidation | Validation for user input insertion. | Updating
 //////////
 void insertValidation(struct Part **head, char funcName[]){
-    //Misc Vars
-    int skipLoop = 0;
-
     //Part Related
     int partNum, partQuan;
     double partPrice;
@@ -513,8 +512,9 @@ void insertValidation(struct Part **head, char funcName[]){
 
     inputLoop("Enter the Part Quantity.", funcName, &partQuan, 0, 1);
     inputLoop("Enter the Part Price.", funcName, 0, &partPrice, 2);
-    if(!(partPointer = (struct Part *)malloc(sizeof(struct Part)))){
-        printf("[%s]: Part creation failed (out of memory)! Sorry, program exiting.", funcName);
+    if((partPointer = (struct Part *)malloc(sizeof(struct Part)))){
+        printf("[%s]: Part creation failed (out of memory)! Sorry, program exiting.\n", funcName);
+        emergencySave(head);
         exit(EXIT_FAILURE);
 
     }
@@ -528,7 +528,7 @@ void insertValidation(struct Part **head, char funcName[]){
 }
 
 //////////
-// deleteStructure | Deletes a stucture and fixes list connections | Updating
+// deleteStructure | Deletes a stucture and fixes list connections | Done
 //////////
 void deleteStructure(struct Part **head){
     if(*head){
@@ -576,7 +576,7 @@ void deleteStructure(struct Part **head){
 }
 
 //////////
-// selectPrint | Prints a specific part based on part number | Updating
+// selectPrint | Prints a specific part based on part number | Done
 //////////
 void selectPrint(struct Part **head){
     if(*head){
@@ -633,9 +633,47 @@ void printList(struct Part **head){
 }
 
 //////////
-// saveList | Saves the list to file | Updating
+// emergencySave | If a list exists on program error, attempts to save to the local directory. | Done
 //////////
-void saveList(struct Part **head, int *savePointer){
+void emergencySave(struct Part **head){
+    if(*head){
+		//File Vars
+	    FILE *exportFileOut; //Export file out
+
+        if(!(exportFileOut = fopen("export.csv", "w"))){
+            exit(EXIT_FAILURE);
+
+        }
+
+	    /*----------
+
+	    LIST SAVING
+
+	    ----------*/
+	    struct Part *temp = *head;
+
+	    while(temp){
+	    	if(fprintf(exportFileOut, "%d,%d,%.2lf\n", temp->num, temp->quantity, temp->price) > 0){//num, quant, price
+				temp = temp->next;
+
+	    	}
+	    	else{
+	    		exit(EXIT_FAILURE);
+
+			}
+
+		}
+		puts("Saved list to \"export\" in local program directory..");
+		fclose(exportFileOut);
+
+	}
+
+}
+
+//////////
+// saveList | Saves the list to file | Done
+//////////
+void saveList(struct Part **head){
     if(*head){//If head exists..
 		//Misc Vars
 		int i; //Validation Var1 & loop increment
@@ -653,6 +691,7 @@ void saveList(struct Part **head, int *savePointer){
 	        if(!mkdir("export")){//Then attempt to make export folder
 	            if(!(exportFolOut = opendir("export"))){//If it still can't be opened..
 	                puts("[Save]: Export folder creation failed! Sorry, program exiting.");
+	                emergencySave(head);
 	                exit(EXIT_FAILURE);
 
 	            }
@@ -660,6 +699,7 @@ void saveList(struct Part **head, int *savePointer){
 	        }
 	        else{//If export folder can't be made..
 	            puts("[Save]: Export folder creation failed! Sorry, program exiting.");
+	            emergencySave(head);
 	            exit(EXIT_FAILURE);
 
 	        }
@@ -687,10 +727,10 @@ void saveList(struct Part **head, int *savePointer){
 
         }
 
-        //printf("User entered: %s", fileName);
         //printf("File Path: %s", strcat(strcat(path, fileName), ".csv"));
         if(!(exportFileOut = fopen(strcat(strcat(path, fileName), ".csv"), "w"))){
             puts("[Save]: File creation failed! Sorry, program exiting.");
+            emergencySave(head);
             exit(EXIT_FAILURE);
 
         }
@@ -705,13 +745,14 @@ void saveList(struct Part **head, int *savePointer){
 	    i = 0;
 	    puts("----------\n");//10 Dashes
 	    while(temp){
-	    	if(fprintf(exportFileOut, "%d,%d,%.2lf\n", temp->num, temp->quantity, temp->price)> 0){//num, quant, price
+	    	if(fprintf(exportFileOut, "%d,%d,%.2lf\n", temp->num, temp->quantity, temp->price) > 0){//num, quant, price
 				printf("\tPart Number: %d saved to file.\n", temp->num);
 				temp = temp->next;
 
 	    	}
 	    	else{
-	    		puts("[Save]: One list member failed to save! Sorry, program exiting.");
+	    		puts("[Save]: One list member failed to save! Sorry, program exiting."); //Might not be needed. With how the program currently works, part must be corrupted somehow.
+	    		emergencySave(head);
 	    		exit(EXIT_FAILURE);
 
 			}
@@ -721,7 +762,6 @@ void saveList(struct Part **head, int *savePointer){
 		}
 		puts("\n----------");
 		printf("[Save]: Save complete (%d parts saved). Check the exports folder.\n", i);
-		*savePointer = 1;
 		fclose(exportFileOut);
 		closedir(exportFolOut);
 	    //printf("Export folder pointer: %p\n", exportFolOut);
@@ -765,9 +805,9 @@ void deleteList(struct Part **head){
 }
 
 //////////
-// createList | Creates a new list. If the list exists, attempt to save. | Updating
+// createList | Creates a new list. If the list exists, attempt to save. | Done
 //////////
-int createList(struct Part **head, int *savePointer){//1 Return success, else fail (for now).
+void createList(struct Part **head, int *savePointer){
     //IO Vars
     char yesNo = 0;
 
@@ -791,7 +831,7 @@ int createList(struct Part **head, int *savePointer){//1 Return success, else fa
 
                 case 'N': case 'n':
                     puts("[Create]: List creation complete.");
-                    return 1;
+                    return;
 
                 default:
                     puts("[Create]: Invalid input. Enter either Y or N.");
@@ -801,8 +841,6 @@ int createList(struct Part **head, int *savePointer){//1 Return success, else fa
             }
 
         }
-
-        return 1;
 
     }
     else{
@@ -814,20 +852,20 @@ int createList(struct Part **head, int *savePointer){//1 Return success, else fa
 
             switch(yesNo){
                 case 'Y': case 'y':
-                    saveList(head, savePointer);
+                    saveList(head);
                     deleteList(head);
                     createList(head, savePointer);
-                    return 1;//temp
+                    return;//temp
 
                 case 'N': case 'n':
                     deleteList(head);
                     puts("[Create]: Discarded current list.");
                     createList(head, savePointer);
-                    return 1;
+                    return;
 
                 case 'C': case 'c':
                     puts("[Create]: List creation canceled.");
-                    return 1;
+                    return;
 
                 default:
                     puts("[Create]: Invalid input. Enter either Y, N or C (for cancel).");
