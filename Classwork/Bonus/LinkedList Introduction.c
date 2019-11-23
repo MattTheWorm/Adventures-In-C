@@ -21,53 +21,113 @@ struct Part{
 //End
 //Function Declaration
 
-void printHelp();
+int createList(struct Part **head, int *savePointer);
+void printList(struct Part **head);
+void selectPrint(struct Part **head);
+void modifyStructure(struct Part **head);
+void deleteStructure(struct Part **head);
+void insertValidation(struct Part **head, char funcName[]);
+void saveList(struct Part **head, int *savePointer);
 void importList(struct Part **head);
-void exitProgram(struct Part **head);
+void exitProgram(struct Part **head, int *savePointer);
+void printHelp();
+//Extra
 void inputLoop(char request[], char funcName[], int *valuePointerInt, double *valuePointerLF, int mode);
 struct Part * partSearch(struct Part **head, int partNum, char funcName[]);
-void modifyStructure(struct Part **head);
 void insertPart(struct Part **head, struct Part *partPointer, char funcName[]);
-void insertValidation(struct Part **head, char funcName[]);
-void deleteStructure(struct Part **head);
-void selectPrint(struct Part **head);
-void printList(struct Part **head);
 void deleteList(struct Part **head);
-void saveList(struct Part **head);
-int createList(struct Part **head);
 
 //End
 int main(){
-    //Parts
-    struct Part *Part1 = (struct Part *)malloc(sizeof(struct Part));
-    Part1->num = 2;
-    Part1->quantity = 11;
-    Part1->price = 1.11;
-    struct Part *Part2 = (struct Part *)malloc(sizeof(struct Part));
-    Part2->num = 4;
-    Part2->quantity = 22;
-    Part2->price = 2.22;
-    struct Part *Part3 = (struct Part *)malloc(sizeof(struct Part));
-    Part3->num = 6;
-    Part3->quantity = 33;
-    Part3->price = 3.33;
-    //Head/Next
-    struct Part *head = Part1;
-    Part1->next = Part2;
-    Part2->next = Part3;
-    Part3->next = NULL;
+    //Head
+    struct Part *head = NULL;
+
+    //IO Vars
+    int i, foundNewLine, save = 0;
+    char userInput[12];
 
     puts("LinkedList session begin.");
     printHelp();
-    importList(&head);
-//    insertValidation(&head, "Insert");
-//    modifyStructure(&head);
-//    deleteStructure(&head);
-//    selectPrint(&head);
-//    printList(&head);
-//    createList(&head);
-    printList(&head);
-    exitProgram(&head);
+    //---
+    while(1){
+        puts("[Main]: Enter your command.");
+        fputs("Input: ", stdout);
+        fgets(userInput, sizeof(userInput), stdin);
+        i = 0;
+        foundNewLine = 0;
+        while(userInput[i]){//While it's not the end of the string
+            if(userInput[i] == '\n'){//If newline character found..
+                userInput[i] = '\0';//Change to null
+                foundNewLine = 1;
+
+            }
+            else if(userInput[i] == ' '){
+                userInput[i] = '\0';
+
+            }
+
+            i++;
+
+        }
+
+        if(!foundNewLine){//If the newline character wasn't found..
+            while(getchar() != '\n'); //Clear buffer
+
+        }
+
+
+        if(!(strcmp(userInput, "create"))){ //Create
+            createList(&head, &save);
+            save = 0;
+
+        }
+        else if(!(strcmp(userInput, "print"))){ //Print
+            printList(&head);
+
+        }
+        else if(!(strcmp(userInput, "select"))){ //Select
+            selectPrint(&head);
+
+        }
+        else if(!(strcmp(userInput, "modify"))){ //Modify
+            modifyStructure(&head);
+            save = 0;
+
+        }
+        else if(!(strcmp(userInput, "delete"))){ //Delete
+            deleteStructure(&head);
+            save = 0;
+
+        }
+        else if(!(strcmp(userInput, "insert"))){ //Insert
+            insertValidation(&head, "Insert");
+            save = 0;
+
+        }
+        else if(!(strcmp(userInput, "save"))){ //Save
+            saveList(&head, &save);
+
+        }
+        else if(!(strcmp(userInput, "add")) || !(strcmp(userInput, "import"))){ //Add
+            importList(&head);
+            save = 0;
+
+        }
+        else if(!(strcmp(userInput, "exit"))){ //Exit
+            exitProgram(&head, &save);
+
+        }
+        else if(!(strcmp(userInput, "help"))){ //Help
+            printHelp();
+
+        }
+        else{
+            puts("[Main]: Invalid command.");
+
+        }
+
+    }
+
     return 0;
 
 }
@@ -116,7 +176,7 @@ void importList(struct Part **head){
 
     //IO Vars
     char yesNo = 0;
-    int endLoop = 1;
+    int endLoop = 1, foundNewLine;
 
     puts("[Import]: Import session started. Enter the path to the target file.");
     i = 0;
@@ -126,13 +186,18 @@ void importList(struct Part **head){
         while(path[i] != '\0'){//While it's not the end of the string
             if(path[i] == '\n'){//If newline character found..
                 path[i] = '\0';//Change to null
+                foundNewLine = 1;
 
             }
 
             i++;
 
         }
-        puts("Made it.");
+
+        if(!foundNewLine){//If the newline character wasn't found..
+            while(getchar() != '\n'); //Clear buffer
+
+        }
         //printf("File Path: %s", path));
         if(!(importFileIn = fopen(path, "r"))){
             puts("[Import]: File failed to open. Would you like to try a new path? [Y/N]");
@@ -198,26 +263,26 @@ void importList(struct Part **head){
         tempPartPointer->price = atof(token);
 
         printf("Imported Part Number %d\n", tempPartPointer->num);
-        printf("Part Number %d | Part Quan: %d | Part Price: %lf\n", tempPartPointer->num, tempPartPointer->quantity, tempPartPointer->price);
-        insertPart(head, tempPartPointer, "Import");
+        //printf("Part Number %d | Part Quan: %d | Part Price: %lf\n", tempPartPointer->num, tempPartPointer->quantity, tempPartPointer->price);
+        insertPart(head, tempPartPointer, 0);
         i++;
 
     }
     puts("\n----------");
     printf("[Import]: Import complete (%d parts imported | %d parts failed).\n", i, x);
     fclose(importFileIn);
-    printf("Export file pointer: %p\n", importFileIn);
+    //printf("Export file pointer: %p\n", importFileIn);
 
 }
 
 //////////
 // exitProgram | Exits the program. If there's a list prompts to save. | Updating
 //////////
-void exitProgram(struct Part **head){
+void exitProgram(struct Part **head, int *savePointer){
     //IO Vars
     char yesNo = 0;
 
-    if(!(*head)){
+    if(*savePointer == 1 || !(*head)){
         puts("Program will now exit..");
         exit(EXIT_SUCCESS);
 
@@ -231,7 +296,7 @@ void exitProgram(struct Part **head){
 
             switch(yesNo){
                 case 'Y': case 'y':
-                    saveList(head);
+                    saveList(head, savePointer);
                     puts("Program will now exit..");
                     exit(EXIT_SUCCESS);
 
@@ -377,8 +442,7 @@ void insertPart(struct Part **head, struct Part *partPointer, char funcName[]){
         skipLoop = 1;
 
     }
-
-    if(partPointer->num < (*head)->num){
+    else if(partPointer->num < (*head)->num){
         i = 0;
         //puts("Skipped loop. (New part num is less than head)");
         partPointer->next = *head;
@@ -406,7 +470,10 @@ void insertPart(struct Part **head, struct Part *partPointer, char funcName[]){
 
     }
 
-    printf("[%s]: Part Number %d inserted into the list at index %d.\n", funcName, partPointer->num, i);
+    if(funcName){
+        printf("[%s]: Part Number %d inserted into the list at index %d.\n", funcName, partPointer->num, i);
+
+    }
 
 }
 
@@ -568,8 +635,8 @@ void printList(struct Part **head){
 //////////
 // saveList | Saves the list to file | Updating
 //////////
-void saveList(struct Part **head){
-    if(head){//If head exists..
+void saveList(struct Part **head, int *savePointer){
+    if(*head){//If head exists..
 		//Misc Vars
 		int i; //Validation Var1 & loop increment
 
@@ -599,18 +666,24 @@ void saveList(struct Part **head){
 
 	    }
 
-        //For now, assume user doesn't exceed 64 character limit.
 	    puts("[Save]: Export folder created, enter your filename. [Max 64 characters]");
         fputs("Input: ", stdout);
         fgets(fileName, sizeof(fileName), stdin);
         i = 0;
+        foundNewLine = 0;
         while(fileName[i] != '\0'){//While it's not the end of the string
             if(fileName[i] == '\n'){//If newline character found..
                 fileName[i] = '\0';//Change to null
+                foundNewLine = 1;
 
             }
 
             i++;
+
+        }
+
+        if(!foundNewLine){//If the newline character wasn't found..
+            while(getchar() != '\n'); //Clear buffer
 
         }
 
@@ -648,13 +721,14 @@ void saveList(struct Part **head){
 		}
 		puts("\n----------");
 		printf("[Save]: Save complete (%d parts saved). Check the exports folder.\n", i);
+		*savePointer = 1;
 		fclose(exportFileOut);
 		closedir(exportFolOut);
 	    //printf("Export folder pointer: %p\n", exportFolOut);
 
 	}
 	else{
-		printf("[Save]: No list currently exists to save!");
+		puts("[Save]: No list currently exists to save!");
 
 	}
 
@@ -693,9 +767,14 @@ void deleteList(struct Part **head){
 //////////
 // createList | Creates a new list. If the list exists, attempt to save. | Updating
 //////////
-int createList(struct Part **head){//1 Return success, else fail (for now).
+int createList(struct Part **head, int *savePointer){//1 Return success, else fail (for now).
     //IO Vars
     char yesNo = 0;
+
+    if(*savePointer == 1){
+        deleteList(head);
+
+    }
 
     if(!(*head)){//If head is null, AKA no list
         puts("[Create]: Creating new list.");
@@ -735,15 +814,15 @@ int createList(struct Part **head){//1 Return success, else fail (for now).
 
             switch(yesNo){
                 case 'Y': case 'y':
-                    saveList(head);
+                    saveList(head, savePointer);
                     deleteList(head);
-                    createList(head);
+                    createList(head, savePointer);
                     return 1;//temp
 
                 case 'N': case 'n':
                     deleteList(head);
                     puts("[Create]: Discarded current list.");
-                    createList(head);
+                    createList(head, savePointer);
                     return 1;
 
                 case 'C': case 'c':
