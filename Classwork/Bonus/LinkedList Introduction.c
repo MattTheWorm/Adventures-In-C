@@ -362,6 +362,7 @@ void insertValidation(struct Part **head, char funcName[]){
 
         if(partSearch(head, partNum, 0)){//If the part number is found..
             printf("[%s]: That part number already exists. Try again.\n", funcName);
+            while(getchar() != '\n'); //Clear buffer
             continue;
 
         }
