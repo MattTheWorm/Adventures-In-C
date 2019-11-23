@@ -22,11 +22,13 @@ struct Part{
 //Function Declaration
 
 void printHelp();
+void importList(struct Part **head);
 void exitProgram(struct Part **head);
 void inputLoop(char request[], char funcName[], int *valuePointerInt, double *valuePointerLF, int mode);
 struct Part * partSearch(struct Part **head, int partNum, char funcName[]);
 void modifyStructure(struct Part **head);
-void insertStructure(struct Part **head, char funcName[]);
+void insertPart(struct Part **head, struct Part *partPointer, char funcName[]);
+void insertValidation(struct Part **head, char funcName[]);
 void deleteStructure(struct Part **head);
 void selectPrint(struct Part **head);
 void printList(struct Part **head);
@@ -57,7 +59,8 @@ int main(){
 
     puts("LinkedList session begin.");
     printHelp();
-//    insertStructure(&head, "Insert");
+    importList(&head);
+//    insertValidation(&head, "Insert");
 //    modifyStructure(&head);
 //    deleteStructure(&head);
 //    selectPrint(&head);
@@ -70,7 +73,7 @@ int main(){
 }
 
 //////////
-// printHelp (C)
+// printHelp | Prints the help menu. | Done
 //////////
 void printHelp(){
 
@@ -100,9 +103,95 @@ void printHelp(){
     putchar('\n');
 
 }
+//////////
+// importList | Imports parts from a file into the current list. | Updating
+//////////
+void importList(struct Part **head){
+    //Misc Vars
+    int i, x; //Loop increment
+
+    //File Vars
+    FILE *importFileIn; //Export file out
+    char path[260]; //260 based on Windows 10 MAX_PATH
+
+    //IO Vars
+    char yesNo = 0;
+    int endLoop = 1;
+
+    puts("[Import]: Import session started. Enter the path to the target file.");
+    i = 0;
+    while(endLoop){
+        fputs("Input: ", stdout);
+        fgets(path, sizeof(path), stdin);
+        while(path[i] != '\0'){//While it's not the end of the string
+            if(path[i] == '\n'){//If newline character found..
+                path[i] = '\0';//Change to null
+
+            }
+
+            i++;
+
+        }
+        puts("Made it.");
+        //printf("File Path: %s", path));
+        if(!(importFileIn = fopen(path, "r"))){
+            puts("[Import]: File failed to open. Would you like to try a new path? [Y/N]");
+            fputs("Input: ", stdout);
+            yesNo = getchar();
+            while(getchar() != '\n'); //Clear buffer
+            switch(yesNo){
+                case 'Y': case 'y':
+                    puts("[Import]: Enter the new path.");
+                    continue;
+
+                case 'N': case 'n':
+                    puts("[Import]: File import canceled.");
+                    return;
+
+                default:
+                    puts("[Import]: Invalid input. Enter either Y or N.");
+
+                //---
+            }
+
+        }
+
+        endLoop = 0;
+
+    }
+
+    puts("[Save]: File read successfully. Attempting to import list.");
+    /*----------
+
+    LIST IMPORT
+
+    ----------*/
+    //Part Related
+    struct Part *temp = *head;
+    int partNum, partQuan;
+    double partPrice;
+
+    //IO Vars
+    char fileLine[128];
+
+    i = 0;
+    x = 0;
+    puts("----------\n");//10 Dashes
+    while(fgets(fileLine, sizeof(fileLine), importFileIn)){//For now, assume files don't have invalid part types
+        //PartNum | Quantity | Price
+        printf("Line data: %s", fileLine);
+
+
+    }
+    puts("\n----------");
+    printf("[Import]: Import complete (%d parts imported | %d parts failed).\n", i, x);
+    fclose(importFileIn);
+    printf("Export file pointer: %p\n", importFileIn);
+
+}
 
 //////////
-// exitProgram | Exits the program. If there's a list prompts to save. | WIP
+// exitProgram | Exits the program. If there's a list prompts to save. | Updating
 //////////
 void exitProgram(struct Part **head){
     //IO Vars
@@ -223,7 +312,7 @@ struct Part * partSearch(struct Part **head, int partNum, char funcName[]){
 };
 
 //////////
-// modifyStructure | Finds a part by number and lets the user input modified values. | WIP
+// modifyStructure | Finds a part by number and lets the user input modified values. | Updating
 //////////
 void modifyStructure(struct Part **head){
     if(*head){
@@ -252,12 +341,61 @@ void modifyStructure(struct Part **head){
 }
 
 //////////
-// insertStructure | Inserts a part by number into the linked list. Sorts it into the appropriate position. | Updating
+// insertPart | Inserts a part by number into the current list. Automatically sorts position. Assumes part can always be inserted without error (other functions that call this should validate any input). | Updating
 //////////
-void insertStructure(struct Part **head, char funcName[]){
-    //Misc Vars
+void insertPart(struct Part **head, struct Part *partPointer, char funcName[]){
+    //Part Related
     struct Part *temp = *head;
+
+    //Misc Vars
     int i, skipLoop = 0;
+
+    if(!(*head)){
+        i = 0;
+        //puts("Skipped loop. (No head detected)");
+        *head = partPointer;
+        skipLoop = 1;
+
+    }
+
+    if(partPointer->num < (*head)->num){
+        i = 0;
+        //puts("Skipped loop. (New part num is less than head)");
+        partPointer->next = *head;
+        *head = partPointer;
+        skipLoop = 1;
+
+    }
+
+    if(!skipLoop){
+        i = 1; //Since head is included.
+        while(temp){
+            //printf("Current pNum: %d | Next pNum: %d\n", temp->num, temp->next->num);
+            if((temp->num < partPointer->num) && (!(temp->next) || partPointer->num < temp->next->num)){//Basically if --> Less < Part < Greater(or doesn't exist)
+                partPointer->next = temp->next;
+                temp->next = partPointer;
+                //printf("Current partPointer: %d | Next partPointer: %p\n", partPointer->num, partPointer->next);
+                break;
+
+            }
+
+            temp = temp->next;
+            i++;
+
+        }
+
+    }
+
+    printf("[%s]: Part Number %d inserted into the list at index %d.\n", funcName, partPointer->num, i);
+
+}
+
+//////////
+// insertValidation | Validation for user input insertion. | Updating
+//////////
+void insertValidation(struct Part **head, char funcName[]){
+    //Misc Vars
+    int skipLoop = 0;
 
     //Part Related
     int partNum, partQuan;
@@ -284,7 +422,6 @@ void insertStructure(struct Part **head, char funcName[]){
         while(getchar() != '\n'); //Clear buffer
         break;
 
-
     }
 
     inputLoop("Enter the Part Quantity.", funcName, &partQuan, 0, 1);
@@ -299,44 +436,7 @@ void insertStructure(struct Part **head, char funcName[]){
     partPointer->quantity = partQuan;
     partPointer->price = partPrice;
     partPointer->next = NULL;
-
-    if(!(*head)){
-        i = 0;
-        puts("Skipped loop. (No head detected)");
-        *head = partPointer;
-        skipLoop = 1;
-
-    }
-
-    if(partPointer->num < (*head)->num){
-        i = 0;
-        puts("Skipped loop. (New part num is less than head)");
-        partPointer->next = *head;
-        *head = partPointer;
-        skipLoop = 1;
-
-    }
-
-    if(!skipLoop){
-        i = 1; //Since head is included.
-        while(temp){
-            //printf("Current pNum: %d | Next pNum: %d\n", temp->num, temp->next->num);
-            if((temp->num < partPointer->num) && (!(temp->next) || partPointer->num < temp->next->num)){//Basically if --> Less < Part < Greater(or doesn't exist)
-                partPointer->next = temp->next;
-                temp->next = partPointer;
-                //printf("Current partPointer: %d | Next partPointer: %p\n", partPointer->num, partPointer->next);
-                break;
-
-            }
-
-            temp = temp->next;
-            i++;
-
-        }
-
-    }
-
-    printf("[%s]: Part Number %d inserted into the list at index %d.\n", funcName, partNum, i);
+    insertPart(head, partPointer, funcName);
 
 }
 
@@ -347,9 +447,8 @@ void deleteStructure(struct Part **head){
     if(*head){
         //Misc Vars
         struct Part *previous = NULL;
-        struct Part *next = NULL;
         struct Part *temp = *head;
-        int i, found;
+        int i;
 
         //Part Related
         int partNum;
@@ -417,7 +516,7 @@ void selectPrint(struct Part **head){
 }
 
 //////////
-// printList | Prints the entire list from head to tail | Updating
+// printList | Prints the entire list from head to tail | Done
 //////////
 void printList(struct Part **head){
     if(*head){
@@ -429,9 +528,9 @@ void printList(struct Part **head){
         puts("----------\n");//10 Dashes
         i = 0;
         while(temp){
-          printf("\t[%d] Part Number: %d | Part Quantity: %d | Part Price: $%.2lf\n", i, temp->num, temp->quantity, temp->price);
-          temp = temp->next;
-          i++;
+            printf("\t[%d] Part Number: %d | Part Quantity: %d | Part Price: $%.2lf\n", i, temp->num, temp->quantity, temp->price);
+            temp = temp->next;
+            i++;
 
         }
 
@@ -580,7 +679,7 @@ int createList(struct Part **head){//1 Return success, else fail (for now).
 
     if(!(*head)){//If head is null, AKA no list
         puts("[Create]: Creating new list.");
-        insertStructure(head, "Create");
+        insertValidation(head, "Create");
         while(1){
             puts("[Create]: Do you want to make another part? [Y/N]");
             fputs("Input: ", stdout);
@@ -588,7 +687,7 @@ int createList(struct Part **head){//1 Return success, else fail (for now).
             while(getchar() != '\n'); //Clear buffer
             switch(yesNo){
                 case 'Y': case 'y':
-                    insertStructure(head, "Create");
+                    insertValidation(head, "Create");
                     break;
 
                 case 'N': case 'n':
