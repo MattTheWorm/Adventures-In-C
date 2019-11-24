@@ -563,20 +563,27 @@ void importList(struct Part **head){
     ----------*/
     //Part Related
     struct Part *tempPartPointer = NULL;
-
-    //IO Vars
-    char fileLine[129], token[32];
+    char fileLine[256];
+    int numberInputs;
 
     i = 0;
     x = 0;
     puts("----------\n");//10 Dashes
-    while(fgets(fileLine, sizeof(fileLine), importFileIn)){//For now, assume files don't have invalid part data types
+    while(fgets(fileLine, sizeof(fileLine),importFileIn)){
+        printf("Line data: %s", fileLine);
+        tempPartPointer = (struct Part *)malloc(sizeof(struct Part));
+        numberInputs = sscanf(fileLine, "%d,%d,%lf", &tempPartPointer->num, &tempPartPointer->quantity, &tempPartPointer->price);
         //PartNum | Quantity | Price
         //PartNum
-        tempPartPointer = (struct Part *)malloc(sizeof(struct Part));
-        strcpy(token, strtok(fileLine, ","));
-        tempPartPointer->num = atoi(token);
-        if(partSearch(head, tempPartPointer->num, 0)){
+        if(numberInputs != 3){
+            puts("Part corrupted in file. Import failed. (Type mismatch)");
+            //printf("%d", numberInputs);
+            free(tempPartPointer);
+            x++;R2WxaeIJcqY
+            continue;
+
+        }
+        else if(partSearch(head, tempPartPointer->num, 0)){
             printf("Part %d already exists. Import failed.\n", tempPartPointer->num);
             free(tempPartPointer);
             x++;
@@ -584,20 +591,13 @@ void importList(struct Part **head){
 
         }
 
-        //Part Quant
-        strcpy(token, strtok(NULL, ","));
-        tempPartPointer->quantity = atoi(token);
-
-        //Part Price
-        strcpy(token, strtok(NULL, "\n"));
-        tempPartPointer->price = atof(token);
-
         printf("Imported Part Number %d\n", tempPartPointer->num);
         //printf("Part Number %d | Part Quan: %d | Part Price: %lf\n", tempPartPointer->num, tempPartPointer->quantity, tempPartPointer->price);
         insertPart(head, tempPartPointer, 0);
         i++;
 
     }
+    free(tempPartPointer);
     puts("\n----------");
     printf("[Import]: Import complete (%d parts imported | %d parts failed).\n", i, x);
     fclose(importFileIn);
