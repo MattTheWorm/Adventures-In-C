@@ -579,7 +579,7 @@ void importList(struct Part **head){
             puts("Part corrupted in file. Import failed. (Type mismatch)");
             //printf("%d", numberInputs);
             free(tempPartPointer);
-            x++;R2WxaeIJcqY
+            x++;
             continue;
 
         }
@@ -879,4 +879,4 @@ void emergencySave(struct Part **head){
 
 }
 
-//End of program 11/23/19@4:07AM []
+//End of program 11/23/19@4:07AM
