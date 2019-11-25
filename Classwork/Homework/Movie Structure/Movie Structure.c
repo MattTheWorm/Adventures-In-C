@@ -4,6 +4,7 @@ Desc: Movie Structure CSV Assignment.
 
 */
 #include <stdio.h>
+#include <string.h>
 //Struct Declaration
 
 struct Movie{
@@ -58,12 +59,17 @@ int main(){
     //
     //File Import
     //
-    char fileLine[128], token;
+    char fileLine[128], token, *length;
 
     puts("---------");//10 Dashes
     while(fgets(fileLine, sizeof(fileLine), importFile)){
         //Name, Rating, Runtime, Rate1, Rate2, Rate3
         printf("Line data: %s", fileLine);
+        //Name
+        length = strtok(fileLine, ",");
+        printf("Movie name length: %ld | Value: %s\n", strlen(length), length);
+        
+        
 
     }
 
