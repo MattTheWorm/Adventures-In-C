@@ -430,7 +430,7 @@ void saveList(struct Part **head){
         fgets(fileName, sizeof(fileName), stdin);
         i = 0;
         foundNewLine = 0;
-        while(fileName[i] != '\0'){//While it's not the end of the string
+        while(fileName[i]){//While it's not the end of the string
             if(fileName[i] == '\n'){//If newline character found..
                 fileName[i] = '\0';//Change to null
                 foundNewLine = 1;
@@ -513,7 +513,7 @@ void importList(struct Part **head){
     while(endLoop){
         fputs("Input: ", stdout);
         fgets(path, sizeof(path), stdin);
-        while(path[i] != '\0'){//While it's not the end of the string
+        while(path[i]){//While it's not the end of the string
             if(path[i] == '\n'){//If newline character found..
                 path[i] = '\0';//Change to null
                 foundNewLine = 1;
