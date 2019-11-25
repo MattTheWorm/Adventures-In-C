@@ -425,7 +425,7 @@ void saveList(struct Part **head){
 
 	    }
 
-	    puts("[Save]: Export folder created, enter your filename. [Max 64 characters]");
+	    puts("[Save]: Export folder created, enter your filename. (.csv will be appended automatically)[Max 64 characters]");
         fputs("Input: ", stdout);
         fgets(fileName, sizeof(fileName), stdin);
         i = 0;
@@ -506,11 +506,11 @@ void importList(struct Part **head){
 
     //IO Vars
     char yesNo = 0;
-    int endLoop = 1, foundNewLine;
+    int endLoop = 1, endLoop2 = 1, foundNewLine;
 
     puts("[Import]: Import session started. Enter the path to the target file.");
     i = 0;
-    while(endLoop){
+    while(endLoop2){
         fputs("Input: ", stdout);
         fgets(path, sizeof(path), stdin);
         while(path[i]){//While it's not the end of the string
@@ -528,30 +528,37 @@ void importList(struct Part **head){
             while(getchar() != '\n'); //Clear buffer
 
         }
-        //printf("File Path: %s", path));
+
+        //printf("File Path: %s", path);
         if(!(importFileIn = fopen(path, "r"))){
             puts("[Import]: File failed to open. Would you like to try a new path? [Y/N]");
-            fputs("Input: ", stdout);
-            yesNo = getchar();
-            while(getchar() != '\n'); //Clear buffer
-            switch(yesNo){
-                case 'Y': case 'y':
-                    puts("[Import]: Enter the new path.");
-                    continue;
+            while(endLoop){
+                fputs("Input: ", stdout);
+                yesNo = getchar();
+                while(getchar() != '\n'); //Clear buffer
+                switch(yesNo){
+                    case 'Y': case 'y':
+                        puts("[Import]: Enter the new path.");
+                        endLoop = 0;
+                        break;
 
-                case 'N': case 'n':
-                    puts("[Import]: File import canceled.");
-                    return;
+                    case 'N': case 'n':
+                        puts("[Import]: File import canceled.");
+                        return;
 
-                default:
-                    puts("[Import]: Invalid input. Enter either Y or N.");
+                    default:
+                        puts("[Import]: Invalid input. Enter either Y or N.");
 
-                //---
+                    //---
+                }
+
             }
 
         }
+        else{
+            endLoop2 = 0;
 
-        endLoop = 0;
+        }
 
     }
 
@@ -570,7 +577,7 @@ void importList(struct Part **head){
     x = 0;
     puts("----------\n");//10 Dashes
     while(fgets(fileLine, sizeof(fileLine),importFileIn)){
-        printf("Line data: %s", fileLine);
+        //printf("Line data: %s", fileLine);
         tempPartPointer = (struct Part *)malloc(sizeof(struct Part));
         numberInputs = sscanf(fileLine, "%d,%d,%lf", &tempPartPointer->num, &tempPartPointer->quantity, &tempPartPointer->price);
         //PartNum | Quantity | Price
