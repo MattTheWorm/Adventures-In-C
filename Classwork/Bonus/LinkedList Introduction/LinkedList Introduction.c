@@ -532,6 +532,7 @@ void importList(struct Part **head){
         //printf("File Path: %s", path);
         if(!(importFileIn = fopen(path, "r"))){
             puts("[Import]: File failed to open. Would you like to try a new path? [Y/N]");
+            endLoop = 1;
             while(endLoop){
                 fputs("Input: ", stdout);
                 yesNo = getchar();
