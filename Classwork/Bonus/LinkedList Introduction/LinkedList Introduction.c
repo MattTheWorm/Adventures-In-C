@@ -583,7 +583,7 @@ void importList(struct Part **head){
         numberInputs = sscanf(fileLine, "%d,%d,%lf", &tempPartPointer->num, &tempPartPointer->quantity, &tempPartPointer->price);
         //PartNum | Quantity | Price
         //PartNum
-        printf("Valid Inputs: %d\n", numberInputs);
+        //printf("Valid Inputs: %d\n", numberInputs);
         if(numberInputs != 3){
             puts("Part corrupted in file. Import failed. (Type mismatch)");
             //printf("%d", numberInputs);
@@ -601,7 +601,7 @@ void importList(struct Part **head){
         }
 
         printf("Imported Part Number %d\n", tempPartPointer->num);
-        printf("Part Number %d | Part Quan: %d | Part Price: %lf\n", tempPartPointer->num, tempPartPointer->quantity, tempPartPointer->price);
+        //printf("Part Number %d | Part Quan: %d | Part Price: %lf\n", tempPartPointer->num, tempPartPointer->quantity, tempPartPointer->price);
         insertPart(head, tempPartPointer, 0);
         i++;
 
