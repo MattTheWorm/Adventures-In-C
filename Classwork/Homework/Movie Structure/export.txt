@@ -1,0 +1,80 @@
+------------
+| Movie #1 |
+------------
+
+	Movie Name: The Polar Express (100m Runtime)
+	Movie Rating: G
+	Critic Ratings: [*8.42, *8.15,*4.52] (Critic Average: *7.03)
+
+------------
+| Movie #2 |
+------------
+
+	Movie Name: Dr Seuss' How the Grinch Stole Christmas (104m Runtime)
+	Movie Rating: PG
+	Critic Ratings: [*5.38, *5.48,*6.80] (Critic Average: *5.89)
+
+------------
+| Movie #3 |
+------------
+
+	Movie Name: Home Alone (103m Runtime)
+	Movie Rating: PG
+	Critic Ratings: [*5.62, *8.68,*8.55] (Critic Average: *7.62)
+
+------------
+| Movie #4 |
+------------
+
+	Movie Name: Home Alone 2 (120m Runtime)
+	Movie Rating: PG
+	Critic Ratings: [*7.74, *6.85,*5.97] (Critic Average: *6.85)
+
+------------
+| Movie #5 |
+------------
+
+	Movie Name: The Nightmare Before Christmas (76m Runtime)
+	Movie Rating: PG
+	Critic Ratings: [*5.87, *6.74,*6.88] (Critic Average: *6.50)
+
+------------
+| Movie #6 |
+------------
+
+	Movie Name: Frosty The Snowman (25m Runtime)
+	Movie Rating: TV-G
+	Critic Ratings: [*8.14, *8.02,*4.58] (Critic Average: *6.91)
+
+------------
+| Movie #7 |
+------------
+
+	Movie Name: Rudolph the Red-Nosed Reindeer (47m Runtime)
+	Movie Rating: TV-G
+	Critic Ratings: [*5.68, *8.73,*4.64] (Critic Average: *6.35)
+
+------------
+| Movie #8 |
+------------
+
+	Movie Name: A Christmas Carol (96m Runtime)
+	Movie Rating: PG
+	Critic Ratings: [*5.69, *8.35,*8.10] (Critic Average: *7.38)
+
+------------
+| Movie #9 |
+------------
+
+	Movie Name: A Charlie Brown Christmas (25m Runtime)
+	Movie Rating: TV-G
+	Critic Ratings: [*9.30, *8.17,*7.02] (Critic Average: *8.16)
+
+------------
+| Movie #10 |
+------------
+
+	Movie Name: Santa Claus Is Comin' to Town (48m Runtime)
+	Movie Rating: G
+	Critic Ratings: [*8.24, *7.85,*7.14] (Critic Average: *7.74)
+
