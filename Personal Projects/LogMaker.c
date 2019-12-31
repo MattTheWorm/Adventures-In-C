@@ -45,7 +45,7 @@ int main(){
 
 
 //////////
-// newLog | Set-up for making a new log. | WIP
+// newLog | Set-up for making a new log. | Updating
 //////////
 
 void newLogCreation(FILE **filePtrPtr){
@@ -112,7 +112,7 @@ void filePrintIO(FILE **filePtrPtr, char inputMessage[], char outputMessage[], c
 //////////////////////////////
 
 //////////
-// createCLT | Function for creating a "Currently listening to:" line. | WIP
+// createCLT | Function for creating a "Currently listening to:" line. | Updating
 //////////
 
 void createCLT(FILE **filePtrPtr){
@@ -141,12 +141,6 @@ void createCLT(FILE **filePtrPtr){
     fprintf(*filePtrPtr, "[%d:%02d%s]\n", (localT->tm_hour % 12 == 0) ? 12 : localT->tm_hour % 12 , localT->tm_min, (localT->tm_hour >= 12) ? "PM" : "AM");
 
 }
-
-//////////
-//
-// Utility Functions
-//
-//////////
 
 //////////
 //
