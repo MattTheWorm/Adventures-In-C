@@ -23,6 +23,9 @@ void filePrintIO(FILE **filePtrPtr, char inputMessage[], char outputMessage[], c
 //--
 void createCLT(FILE **filePtrPtr);
 
+// Utility Functions
+int runCommand(char string[], FILE **filePtrPtr);
+
 // IO/Cleanup Functions
 int validateBuffer(char string[]);
 void removeNewline(char string[]);
@@ -31,8 +34,26 @@ void clrBuffer();
 //End
 int main(){
     FILE *filePtr;
+    char userInput[USR_INPUT];
 
     newLogCreation(&filePtr);
+    puts("-----");
+    puts("Main log sequence started. Input a command with \"!\" or a regular line.");
+    puts("-----");
+    while(1){
+        fgets(userInput, sizeof(userInput), stdin);
+        validateBuffer(userInput);
+        if(userInput[0] == '!'){
+            removeNewline(userInput);
+            runCommand(userInput, &filePtr);
+            continue;
+
+        }
+
+        fputs(userInput, filePtr);
+
+    }
+
     return 0;
 
 }
@@ -138,7 +159,36 @@ void createCLT(FILE **filePtrPtr){
 
     }
 
-    fprintf(*filePtrPtr, "[%d:%02d%s]\n", (localT->tm_hour % 12 == 0) ? 12 : localT->tm_hour % 12 , localT->tm_min, (localT->tm_hour >= 12) ? "PM" : "AM");
+    fprintf(*filePtrPtr, "[%d:%02d%s]\n\n", (localT->tm_hour % 12 == 0) ? 12 : localT->tm_hour % 12 , localT->tm_min, (localT->tm_hour >= 12) ? "PM" : "AM");
+
+}
+
+
+//////////
+//
+// Utility Functions
+//
+//////////
+
+
+//////////
+// runCommand | Command menu. | WIP
+// Return Value: 1+ - Returns the command value.
+//////////
+
+int runCommand(char string[], FILE **filePtrPtr){
+    if(!strcmpi("!clt", string)){
+        createCLT(filePtrPtr);
+
+    }
+    else if(!strcmpi("!exit", string)){
+        exit(EXIT_SUCCESS);
+
+    }
+    else{
+        puts("[WARN] Invalid command!");
+
+    }
 
 }
 
@@ -147,6 +197,7 @@ void createCLT(FILE **filePtrPtr){
 // IO/Cleanup Functions
 //
 //////////
+
 
 //////////
 // validateBuffer | Assumes string has newline character at the end. If it does, there **should** be no characters in the buffer. Otherwise, clear buffer. Linear time. | Done
@@ -165,6 +216,7 @@ int validateBuffer(char string[]){
         i++;
 
     }
+
     puts("[WARN] Buffer overflow detected! Characters dropped.");
     clrBuffer();
     return 0;
@@ -191,8 +243,6 @@ void removeNewline(char string[]){
 //////////
 
 void clrBuffer(){
-    int i = 0;
-
     while(getchar() != '\n');
 
 }
