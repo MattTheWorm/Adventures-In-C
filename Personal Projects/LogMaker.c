@@ -7,8 +7,10 @@ Desc: Program to automating the creation of logs.
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <windows.h>
 #define USR_INPUT 512
 #define PATH_SIZE 256
+#define VERSION 1
 //Struct Declaration
 
 typedef struct tm tm;
@@ -25,6 +27,7 @@ void createCLT(FILE **filePtrPtr);
 
 // Utility Functions
 int runCommand(char string[], FILE **filePtrPtr);
+void updateMode(char string[]);
 
 // IO/Cleanup Functions
 int validateBuffer(char string[]);
@@ -36,11 +39,13 @@ int main(){
     FILE *filePtr;
     char userInput[USR_INPUT];
 
+    updateMode("Setup");
     newLogCreation(&filePtr);
     puts("-----");
     puts("Main log sequence started. Input a command with \"!\" or a regular line.");
     puts("-----");
     while(1){
+        updateMode("Standard");
         fgets(userInput, sizeof(userInput), stdin);
         validateBuffer(userInput);
         if(userInput[0] == '!'){
@@ -74,7 +79,6 @@ void newLogCreation(FILE **filePtrPtr){
     tm *localT;
     char yesNo, logName[129], fullPath[PATH_SIZE], userInput[USR_INPUT];
     int i = 0;
-
 
     puts("Welcome Matt!\nSet log name? (Y / N)");
     while(1){//YesNo validation
@@ -149,11 +153,11 @@ void createCLT(FILE **filePtrPtr){
     localT = localtime(&currentTime);
     switch(strcmpi("na", userInput)){
         case 0:
-            fprintf(*filePtrPtr, "Currently listening to: \"N/A\" ");
+            fprintf(*filePtrPtr, "\nCurrently listening to: \"N/A\" ");
             break;
 
         default:
-            fprintf(*filePtrPtr, "Currently listening to: \"%s\" ", userInput);
+            fprintf(*filePtrPtr, "\nCurrently listening to: \"%s\" ", userInput);
 
         //
 
@@ -189,6 +193,18 @@ int runCommand(char string[], FILE **filePtrPtr){
         puts("[WARN] Invalid command!");
 
     }
+
+}
+
+//////////
+// updateMode | Updates the console title with appropriate mode. | Updating
+//////////
+
+void updateMode(char string[]){
+    char fullTitle[64];
+
+    snprintf(fullTitle, sizeof(fullTitle), "| Log Maker v%d | Mode: %s |", VERSION, string);
+    SetConsoleTitle(fullTitle);
 
 }
 
